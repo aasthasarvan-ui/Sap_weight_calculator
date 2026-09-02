@@ -986,7 +986,7 @@
     const qtyCol = document.getElementById('selQtyCol').value;
     const billCol = document.getElementById('selBillCol').value;
     
-    // 🔹 Category Scope (Main calculator wala dropdown ya Add-on dropdown)
+    // Category Scope detection for add-on
     const scope = document.getElementById('addonCalcModeScope')?.value || document.getElementById('calcModeScope')?.value || 'all';
 
     if (!veh || !filteredData.length) return;
@@ -1002,7 +1002,7 @@
         let d = String(r[detectedCols.desc] || '').toUpperCase();
         let u = String(r[detectedCols.unit] || '').toUpperCase();
 
-        // 🔹 Category Scope Filtering Logic (Only BAGS / Only EA / All)
+        // Category Scope Filter Logic
         if (scope === 'bags' && u.includes('EA')) return;
         if (scope === 'ea' && !u.includes('EA')) return;
 
@@ -1019,11 +1019,15 @@
 
     let totBags = s50 + s25;
 
-    // 🔹 Separate Calculations for Bags (Opt 1 & Opt 2)
+    // Bags Weight Slabs
     let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
     let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
 
-    // Global variables me save karein taaki WhatsApp message me exact do alag slips ki tarah jaye
+    // 🔹 TOTAL WEIGHT = Bags Weight + EA Weight (Exact match with Main Calculator)
+    let totalOpt1 = bagsWt1 + eaWt;
+    let totalOpt2 = bagsWt2 + eaWt;
+
+    // Global variables for WhatsApp sync
     window.lastCalcBagsOpt1 = bagsWt1;
     window.lastCalcBagsOpt2 = bagsWt2;
     window.lastCalcEaWt = eaWt;
@@ -1034,11 +1038,11 @@
     document.getElementById('addonMTot').innerText = totBags.toLocaleString() + " Bags";
     document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
     
-    // UI Display matching exact screenshots format
-    document.getElementById('addonOpt1MT').innerText = (bagsWt1 / 1000.0).toFixed(3) + " MT";
-    document.getElementById('addonOpt1Kg').innerText = `↑ ${bagsWt1.toFixed(2)} Kgs`;
-    document.getElementById('addonOpt2MT').innerText = (bagsWt2 / 1000.0).toFixed(3) + " MT";
-    document.getElementById('addonOpt2Kg').innerText = `↑ ${bagsWt2.toFixed(2)} Kgs`;
+    // UI Display with combined Slabs total (Opt 1 & Opt 2) and separate EA Weight
+    document.getElementById('addonOpt1MT').innerText = (totalOpt1 / 1000.0).toFixed(3) + " MT";
+    document.getElementById('addonOpt1Kg').innerText = `↑ ${totalOpt1.toFixed(2)} Kgs`;
+    document.getElementById('addonOpt2MT').innerText = (totalOpt2 / 1000.0).toFixed(3) + " MT";
+    document.getElementById('addonOpt2Kg').innerText = `↑ ${totalOpt2.toFixed(2)} Kgs`;
     document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
     document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
 }
