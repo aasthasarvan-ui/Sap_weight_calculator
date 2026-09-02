@@ -261,6 +261,7 @@
                 <!-- 🔽 YAHAN CATEGORY SCOPE DROPDOWN ADD KIYA GAYA HAI 🔽 -->
                 <label style="margin-top: 10px;">🔍 [Add-on] Category Scope:</label>
                 <select id="addonCalcModeScope" onchange="addonCalculate()">
+                <select id="addonCalcModeScope" onchange="addonProcessTrips(); addonCalculate();">
                     <option value="all">All (Bags + EA Combined)</option>
                     <option value="bags">Only BAGS</option>
                     <option value="ea">Only EA (Loose Invoices)</option>
@@ -818,40 +819,50 @@
         }
 
         function addonProcessTrips() {
-            const veh = document.getElementById('addonSelVehicle').value;
-            const vehCol = detectedCols.veh;
-            const billCol = document.getElementById('selBillCol').value;
-            if (!veh || !vehCol || !billCol) return;
+    const veh = document.getElementById('addonSelVehicle').value;
+    const vehCol = detectedCols.veh;
+    const billCol = document.getElementById('selBillCol').value;
+    const scope = document.getElementById('addonCalcModeScope')?.value || document.getElementById('calcModeScope')?.value || 'all'; // 👈 Scope uthaya
 
-            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
-            let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
+    if (!veh || !vehCol || !billCol) return;
 
-            let numBills = bills.map(b => {
-                let nums = b.match(/\d+/g);
-                return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
-            }).sort((a,b) => a.num - b.num);
+    let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
 
-            let trips = [], curTrip = [], prevNum = null;
-            numBills.forEach(item => {
-                if (prevNum === null || (item.num - prevNum <= 3)) {
-                    curTrip.push(item.orig);
-                } else {
-                    trips.push(curTrip);
-                    curTrip = [item.orig];
-                }
-                prevNum = item.num > 0 ? item.num : prevNum;
-            });
-            if (curTrip.length) trips.push(curTrip);
+    // 🔹 Add-on ke liye bhi Scope filter apply karein
+    rows = rows.filter(r => {
+        let u = String(r[detectedCols.unit] || 'BAG').toUpperCase();
+        if (scope === 'bags' && u.includes('EA')) return false;
+        if (scope === 'ea' && !u.includes('EA')) return false;
+        return true;
+    });
 
-            window.addonTripsMap = trips;
-            window.addonAllBills = bills;
+    let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
 
-            let bannerText = trips.map((grp, idx) => `Trip ${idx+1}: ${grp[0]} to ${grp[grp.length-1]}`).join(" | ");
-            document.getElementById('addonAutoDetectedBanner').innerHTML = `🔍 Auto-Detected Trips: ${bannerText}`;
+    let numBills = bills.map(b => {
+        let nums = b.match(/\d+/g);
+        return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
+    }).sort((a,b) => a.num - b.num);
 
-            addonRenderSelectionUI();
+    let trips = [], curTrip = [], prevNum = null;
+    numBills.forEach(item => {
+        if (prevNum === null || (item.num - prevNum <= 3)) {
+            curTrip.push(item.orig);
+        } else {
+            trips.push(curTrip);
+            curTrip = [item.orig];
         }
+        prevNum = item.num > 0 ? item.num : prevNum;
+    });
+    if (curTrip.length) trips.push(curTrip);
 
+    window.addonTripsMap = trips;
+    window.addonAllBills = bills;
+
+    let bannerText = trips.map((grp, idx) => `Trip ${idx+1}: ${grp[0]} to ${grp[grp.length-1]}`).join(" | ");
+    document.getElementById('addonAutoDetectedBanner').innerHTML = `🔍 Auto-Detected Trips: ${bannerText}`;
+
+    addonRenderSelectionUI();
+}
         function addonRenderSelectionUI() {
             const style = document.querySelector('input[name="addonStyle"]:checked').value;
             const container = document.getElementById('addonDynamicUI');
