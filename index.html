@@ -1049,8 +1049,7 @@
 </div>
 
 <script>
-  
-  function sendWhatsAppDispatch() {
+   function sendWhatsAppDispatch() {
     const mobile = document.getElementById('waMobileNumber').value.trim();
     
     // Vehicle check
@@ -1095,30 +1094,64 @@
     const currentDate = new Date().toLocaleDateString('en-IN');
     const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-    // Dynamic vehicle theme
+    // --- UNIQUE VEHICLE FONT GENERATOR ---
     let charSum = 0;
     for (let i = 0; i < veh.length; i++) {
         charSum += veh.charCodeAt(i);
     }
+    let fontStyleIndex = charSum % 3;
+
+    function applySafeFont(text, styleType) {
+        if (!text) return "";
+        const maps = {
+            serifBold: { upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙", lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳", digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗" },
+            sansBold: { upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝗨𝗩𝑊𝗫𝗬𝑍", lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇", digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿" },
+            boldItalic: { upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁", lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝐥𝒎𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛", digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗" }
+        };
+        let activeMap = maps.serifBold;
+        if (styleType === 1) activeMap = maps.sansBold;
+        else if (styleType === 2) activeMap = maps.boldItalic;
+
+        const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const normalLower = "abcdefghijklmnopqrstuvwxyz";
+        const normalDigits = "0123456789";
+
+        let result = "";
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let uIdx = normalUpper.indexOf(char);
+            let lIdx = normalLower.indexOf(char);
+            let dIdx = normalDigits.indexOf(char);
+            if (uIdx !== -1) result += activeMap.upper[uIdx] || char;
+            else if (lIdx !== -1) result += activeMap.lower[lIdx] || char;
+            else if (dIdx !== -1) result += activeMap.digits[dIdx] || char;
+            else result += char;
+        }
+        return result;
+    }
+
     const themes = [
         { title: "EXPRESS DISPATCH", emoji: "🚀" },
         { title: "PRIORITY LOGISTICS", emoji: "⚡" },
         { title: "SECURE TRANSIT", emoji: "🛡️" }
     ];
     let currentTheme = themes[charSum % themes.length];
+
+    let styledVeh = applySafeFont("Vehicle No: " + veh, fontStyleIndex);
+    let styledTotal = applySafeFont("Total Bags: " + totalBags, fontStyleIndex);
     let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
 
-    // Clean, formatted message with PNPL SCM MOGA & Signature
+    // Message with Unique Font & Signature
     let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
                   "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
                   "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
                   currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
-                  "🔹 Vehicle No: " + veh + "\n" +
-                  "📌 Status: ✅ Approved for Dispatch\n\n" +
+                  "🔹 " + styledVeh + "\n" +
+                  "📌 Status: ✅ Approved for Dispatch\n" +
                   "📦 50 Kg Bags: " + bag50 + "\n" +
                   "📦 25 Kg Bags: " + bag25 + "\n" +
                   "📦 EA Unit (Loose): " + eaQty + "\n" +
-                  "📊 Total Bags: " + totalBags + "\n" +
+                  "📊 " + styledTotal + "\n" +
                   "🧾 Bill Numbers: " + billsText + "\n\n" +
                   "📅 Date: " + currentDate + " | 🕒 Time: " + currentTime + "\n\n" +
                   "━━━━━━━━━━━━━━━━━━━━━━\n" +
@@ -1127,9 +1160,7 @@
                   "──➦ [ PNPL SCM MOGA Hub ]\n" +
                   "━━━━━━━━━━━━━━━━━━━━━━";
 
-    // Direct App Scheme URL (Exact working method)
     let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
-    
     window.location.href = url;
 }
  </script>
