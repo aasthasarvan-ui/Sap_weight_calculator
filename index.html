@@ -1031,16 +1031,18 @@
 </body>
 </html>
 
-   <!-- Quick WhatsApp Dispatch Alert (100% Working & Click-Fix) -->
+ <!-- Quick WhatsApp Dispatch Alert (Optional Number + PNPL SCM MOGA + Unique Fonts) -->
 <div class="card" style="border-color: #25d366; background: #0f172a;">
     <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
     <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
-        PNPL SCM MOGA dispatch clearance with dynamic vehicle styling and instant click.
+        PNPL SCM MOGA dispatch clearance with dynamic vehicle styling and digital signature.
     </p>
-
     <div class="row">
         <div class="col">
-            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0; height: 43px; width: 100%; cursor: pointer;">
+            <input type="text" id="waMobileNumber" placeholder="Enter Mobile No. (Optional)" style="margin-bottom: 8px;">
+        </div>
+        <div class="col">
+            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0; height: 43px; cursor: pointer;">
                 🚀 Send WhatsApp Message
             </button>
         </div>
@@ -1048,155 +1050,147 @@
 </div>
 
 <script>
-    // Helper function for clean readable fonts
-    function applyCleanFont(text, styleType) {
-        if (!text) return "";
-        
-        const maps = {
-            serifBold: {
-                upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙",
-                lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳",
-                digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
-            },
-            sansBold: {
-                upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝗨𝗩𝑊𝗫𝗬𝑍",
-                lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇",
-                digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿"
-            },
-            boldItalic: {
-                upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
-                lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝒍𝒎𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
-                digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
-            }
-        };
-
-        let activeMap = maps.serifBold;
-        if (styleType === 1) activeMap = maps.sansBold;
-        else if (styleType === 2) activeMap = maps.boldItalic;
-
-        const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const normalLower = "abcdefghijklmnopqrstuvwxyz";
-        const normalDigits = "0123456789";
-
-        let result = "";
-        for (let i = 0; i < text.length; i++) {
-            let char = text[i];
-            let uIdx = normalUpper.indexOf(char);
-            let lIdx = normalLower.indexOf(char);
-            let dIdx = normalDigits.indexOf(char);
-
-            if (uIdx !== -1) {
-                result += activeMap.upper[uIdx] || char;
-            } else if (lIdx !== -1) {
-                result += activeMap.lower[lIdx] || char;
-            } else if (dIdx !== -1) {
-                result += activeMap.digits[dIdx] || char;
-            } else {
-                result += char;
-            }
+// Helper function to apply high-readability clean fonts dynamically per vehicle
+function applyCleanFont(text, styleType) {
+    if (!text) return "";
+    
+    const maps = {
+        serifBold: {
+            upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙",
+            lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳",
+            digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
+        },
+        sansBold: {
+            upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝗨𝗩𝑊𝗫𝗬𝑍",
+            lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇",
+            digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿"
+        },
+        boldItalic: {
+            upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
+            lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝒍𝐦𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
+            digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
         }
-        return result;
+    };
+
+    let activeMap = maps.serifBold;
+    if (styleType === 1) activeMap = maps.sansBold;
+    else if (styleType === 2) activeMap = maps.boldItalic;
+
+    const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const normalLower = "abcdefghijklmnopqrstuvwxyz";
+    const normalDigits = "0123456789";
+
+    let result = "";
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        let uIdx = normalUpper.indexOf(char);
+        let lIdx = normalLower.indexOf(char);
+        let dIdx = normalDigits.indexOf(char);
+
+        if (uIdx !== -1) {
+            result += activeMap.upper[uIdx] || char;
+        } else if (lIdx !== -1) {
+            result += activeMap.lower[lIdx] || char;
+        } else if (dIdx !== -1) {
+            result += activeMap.digits[dIdx] || char;
+        } else {
+            result += char;
+        }
+    }
+    return result;
+}
+
+function sendWhatsAppDispatch() {
+    const mobile = document.getElementById('waMobileNumber').value.trim();
+    
+    // Vehicle check
+    let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
+    
+    if (!veh) {
+        alert("Kripya pehle vehicle select karein.");
+        return;
     }
 
-    function sendWhatsAppDispatch() {
-        // Vehicle check
-        let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
-        
-        if (!veh) {
-            alert("Kripya pehle vehicle select karein.");
-            return;
-        }
+    // Total bags check
+    let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
+    let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
+    let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
+    let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
 
-        // Total bags check
-        let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
-        let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
-        let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
-        let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
+    // --- BULLETPROOF BILL NUMBER EXTRACTION ---
+    let activeBills = [];
 
-        // Bill Numbers extraction
-        let activeBills = [];
-        const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
-        addonPills.forEach(pill => {
+    const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
+    addonPills.forEach(pill => {
+        let text = pill.textContent.replace('×', '').trim();
+        if (text) activeBills.push(text);
+    });
+
+    if (activeBills.length === 0) {
+        const mainPills = document.querySelectorAll('#mainBillPillBox .streamlit-pill');
+        mainPills.forEach(pill => {
             let text = pill.textContent.replace('×', '').trim();
             if (text) activeBills.push(text);
         });
-
-        if (activeBills.length === 0) {
-            const mainPills = document.querySelectorAll('#mainBillPillBox .streamlit-pill');
-            mainPills.forEach(pill => {
-                let text = pill.textContent.replace('×', '').trim();
-                if (text) activeBills.push(text);
-            });
-        }
-
-        if (activeBills.length === 0) {
-            if (window.addonSelectedBills && window.addonSelectedBills.length > 0) {
-                activeBills = window.addonSelectedBills;
-            } else if (window.mainSelectedBills && window.mainSelectedBills.length > 0) {
-                activeBills = window.mainSelectedBills;
-            }
-        }
-
-        const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
-        const currentDate = new Date().toLocaleDateString('en-IN');
-        const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-        // --- UNIQUE DYNAMIC READABLE FONT & THEME PER VEHICLE ---
-        let charSum = 0;
-        for (let i = 0; i < veh.length; i++) {
-            charSum += veh.charCodeAt(i);
-        }
-        let fontStyleIndex = charSum % 3;
-
-        const themes = [
-            { title: "EXPRESS DISPATCH", emoji: "🚀" },
-            { title: "PRIORITY LOGISTICS", emoji: "⚡" },
-            { title: "SECURE TRANSIT", emoji: "🛡️" }
-        ];
-        let currentTheme = themes[charSum % themes.length];
-
-        // Apply clean readable font transformation
-        let styledVeh = applyCleanFont("Vehicle No: " + veh, fontStyleIndex);
-        let styledBags50 = applyCleanFont("50 Kg Bags: " + bag50, fontStyleIndex);
-        let styledBags25 = applyCleanFont("25 Kg Bags: " + bag25, fontStyleIndex);
-        let styledEa = applyCleanFont("EA Unit (Loose): " + eaQty, fontStyleIndex);
-        let styledTotal = applyCleanFont("Total Bags: " + totalBags, fontStyleIndex);
-        let styledBills = applyCleanFont("Bill Numbers: " + billsText, fontStyleIndex);
-
-        let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
-
-        // Professional Clean Message Format
-        let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
-                      "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
-                      "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-                      currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
-                      "🔹 " + styledVeh + "\n" +
-                      "📌 *Status:* ✅ Approved for Dispatch\n\n" +
-                      "📦 " + styledBags50 + "\n" +
-                      "📦 " + styledBags25 + "\n" +
-                      "📦 " + styledEa + "\n" +
-                      "📊 " + styledTotal + "\n" +
-                      "🧾 " + styledBills + "\n\n" +
-                      "📅 *Date:* " + currentDate + " | 🕒 *Time:* " + currentTime + "\n\n" +
-                      "━━━━━━━━━━━━━━━━━━━━━━\n" +
-                      "✍️ *Authorized Signature:*\n" +
-                      humanSign + "\n" +
-                      "──➦ [ PNPL SCM MOGA Hub ]\n" +
-                      "━━━━━━━━━━━━━━━━━━━━━━";
-
-        // Bulletproof opening method with fallback
-        let waUrl = "whatsapp://send?text=" + encodeURIComponent(message);
-        let fallbackUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-
-        // Try opening app scheme, fallback to web api if blocked
-        let iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = waUrl;
-        document.body.appendChild(iframe);
-        
-        setTimeout(function() {
-            document.body.removeChild(iframe);
-            window.location.href = fallbackUrl;
-        }, 500);
     }
+
+    if (activeBills.length === 0) {
+        if (window.addonSelectedBills && window.addonSelectedBills.length > 0) {
+            activeBills = window.addonSelectedBills;
+        } else if (window.mainSelectedBills && window.mainSelectedBills.length > 0) {
+            activeBills = window.mainSelectedBills;
+        }
+    }
+
+    const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
+    const currentDate = new Date().toLocaleDateString('en-IN');
+    const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+    // --- UNIQUE DYNAMIC READABLE FONT & THEME PER VEHICLE ---
+    let charSum = 0;
+    for (let i = 0; i < veh.length; i++) {
+        charSum += veh.charCodeAt(i);
+    }
+    let fontStyleIndex = charSum % 3;
+
+    const themes = [
+        { title: "EXPRESS DISPATCH", emoji: "🚀" },
+        { title: "PRIORITY LOGISTICS", emoji: "⚡" },
+        { title: "SECURE TRANSIT", emoji: "🛡️" }
+    ];
+    let currentTheme = themes[charSum % themes.length];
+
+    let styledVeh = applyCleanFont("Vehicle No: " + veh, fontStyleIndex);
+    let styledBags50 = applyCleanFont("50 Kg Bags: " + bag50, fontStyleIndex);
+    let styledBags25 = applyCleanFont("25 Kg Bags: " + bag25, fontStyleIndex);
+    let styledEa = applyCleanFont("EA Unit (Loose): " + eaQty, fontStyleIndex);
+    let styledTotal = applyCleanFont("Total Bags: " + totalBags, fontStyleIndex);
+    let styledBills = applyCleanFont("Bill Numbers: " + billsText, fontStyleIndex);
+
+    let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
+
+    // Clean Branded Message Format
+    let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                  currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
+                  "🔹 " + styledVeh + "\n" +
+                  "📌 *Status:* ✅ Approved for Dispatch\n\n" +
+                  "📦 " + styledBags50 + "\n" +
+                  "📦 " + styledBags25 + "\n" +
+                  "📦 " + styledEa + "\n" +
+                  "📊 " + styledTotal + "\n" +
+                  "🧾 " + styledBills + "\n\n" +
+                  "📅 *Date:* " + currentDate + " | 🕒 *Time:* " + currentTime + "\n\n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  "✍️ *Authorized Signature:*\n" +
+                  humanSign + "\n" +
+                  "──➦ [ PNPL SCM MOGA Hub ]\n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━";
+
+    // Flexible URL scheme (Works whether number is entered or left blank)
+    let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
+    
+    window.location.href = url;
+}
 </script>
