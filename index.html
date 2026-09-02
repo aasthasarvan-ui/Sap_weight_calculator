@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -62,7 +62,6 @@
         button.btn-danger { background: var(--danger-color); color: #fff; }
         button.btn-secondary { background: #475569; color: #fff; }
 
-        /* Streamlit style Tag Pill Box */
         .streamlit-pill-box {
             background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px;
             padding: 8px 10px; min-height: 48px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
@@ -73,7 +72,6 @@
             font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;
         }
         .streamlit-pill span { cursor: pointer; font-weight: bold; opacity: 0.8; }
-        .streamlit-pill span:hover { opacity: 1; }
         .pill-dropdown-content {
             display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1e293b;
             border: 1px solid var(--border-color); border-radius: 8px; z-index: 100; max-height: 150px; overflow-y: auto;
@@ -88,25 +86,15 @@
         .metric-val { font-size: 22px; font-weight: 800; color: var(--text-color); margin-top: 4px; }
         .metric-sub { font-size: 11px; color: var(--subtext-color); font-weight: 600; text-transform: uppercase; }
 
-        .table-responsive { overflow-x: auto; max-height: 400px; margin-top: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
-        th, td { padding: 10px 12px; border: 1px solid var(--border-color); white-space: nowrap; }
-        th { background: #0f172a; color: var(--accent-color); position: sticky; top: 0; z-index: 10; font-weight: 700; }
-        tr:nth-child(even) { background: rgba(255,255,255,0.015); }
-        tr:hover { background: rgba(56, 189, 248, 0.05); }
-
         .radio-group, .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 12px; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
         .radio-group label, .checkbox-group label { display: flex; align-items: center; gap: 6px; color: var(--text-color); cursor: pointer; margin-bottom: 0; text-transform: none; font-weight: 500; }
         
         details summary { cursor: pointer; font-weight: 700; color: var(--accent-color); font-size: 14px; margin-bottom: 12px; user-select: none; }
-        details summary:hover { color: var(--accent-hover); }
         hr { border-color: var(--border-color); margin: 20px 0; }
     </style>
 
-    <!-- SheetJS Library -->
+    <!-- SheetJS & Firebase Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <!-- Firebase SDKs (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
@@ -117,7 +105,7 @@
         <div>
             <h2 style="margin: 0; color: var(--text-color); font-size: 22px;">🚚 Enterprise Vehicle Tonnage Hub (Plant 2100)</h2>
             <p style="margin: 6px 0 0 0; color: var(--subtext-color); font-size: 13px;">
-                Firebase Cloud Vault Sync (Auto-Deletes files after 2 Days), Lightning-Fast Tonnage Calculators.
+                Firebase Cloud Vault Sync, Lightning-Fast Tonnage Calculators.
             </p>
         </div>
         <div class="live-clock-box" id="liveClock">🕒 Initializing Clock...</div>
@@ -161,6 +149,24 @@
             <!-- GLOBAL SEARCH BAR -->
             <div class="card" style="padding: 14px;">
                 <input type="text" id="globalSearch" placeholder="🔍 Global Keyword Search (Vehicle No, Customer, Material, Document)..." oninput="filterAndRenderData()" style="margin: 0;">
+            </div>
+
+            <!-- WHATSAPP DISPATCH ALERT COMPONENT (CLEAN & INTEGRATED) -->
+            <div class="card" style="border-color: #25d366; background: #0f172a;">
+                <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
+                <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
+                    1 click me 50kg, 25kg, EA unit, total bags aur exact bill numbers ke sath WhatsApp alert bhechein.
+                </p>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" id="waMobileNumber" placeholder="Enter Mobile No. (e.g., 919876543210)" style="margin-bottom: 8px;">
+                    </div>
+                    <div class="col">
+                        <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0; height: 43px; cursor: pointer;">
+                            🚀 Send WhatsApp Message
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- 1. VEHICLE TONNAGE CALCULATOR -->
@@ -226,95 +232,8 @@
                             <div class="metric-card"><div class="metric-sub">Total Bags (50+25)</div><div class="metric-val" id="mTotBag">0 Bags</div></div>
                             <div class="metric-card"><div class="metric-sub">EA (Loose Qty)</div><div class="metric-val" id="mEAQty">0</div></div>
                         </div>
-                        <div class="metric-grid">
-                            <div class="metric-card" style="border-color: var(--accent-color);">
-                                <div class="metric-sub">Precision Scale (Opt 1)</div>
-                                <div class="metric-val" id="mOpt1MT">0.000 MT</div>
-                                <div class="metric-sub" id="mOpt1Kg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card" style="border-color: var(--success-color);">
-                                <div class="metric-sub">Standard Slabs (Opt 2)</div>
-                                <div class="metric-val" id="mOpt2MT">0.000 MT</div>
-                                <div class="metric-sub" id="mOpt2Kg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-sub">EA Weight</div>
-                                <div class="metric-val" id="mEAMT">0.000 MT</div>
-                                <div class="metric-sub" id="mEAKg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
-                            </div>
-                        </div>
                     </div>
                 </details>
-            </div>
-
-            <!-- 2. TRIPLE-MODE ADVANCED ADD-ON MODULE -->
-            <div class="card">
-                <details open>
-                    <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
-                    <div style="margin-top: 12px;">
-                        <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
-                        <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
-                        
-                        <label>🚛 Select Vehicle:</label>
-                        <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
-                    </div>
-
-                    <div class="trip-auto-banner" id="addonAutoDetectedBanner">
-                        🔍 Auto-Detected Trips: None
-                    </div>
-
-                    <label>Choose Selection Style:</label>
-                    <div class="radio-group" id="addonStyleGroup">
-                        <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
-                        <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
-                        <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
-                    </div>
-
-                    <div id="addonDynamicUI" style="margin-top: 12px;"></div>
-
-                    <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
-                    <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
-                        <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
-                        <div class="pill-dropdown-content" id="addonBillDropdown"></div>
-                    </div>
-
-                    <!-- ADD-ON LIVE METRICS -->
-                    <div id="addonMetricsOutput" style="margin-top: 15px; background: #0b0f19; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <h4 id="addonLiveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Totals for Vehicle</h4>
-                        <div class="metric-grid">
-                            <div class="metric-card"><div class="metric-sub">50 Kg Bags</div><div class="metric-val" id="addonM50">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">25 Kg Bags</div><div class="metric-val" id="addonM25">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">Total Bags</div><div class="metric-val" id="addonMTot">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">EA Quantity</div><div class="metric-val" id="addonMEA">0</div></div>
-                        </div>
-                        <div class="metric-grid">
-                            <div class="metric-card" style="border-color: var(--accent-color);">
-                                <div class="metric-sub">Precision Scale (Opt 1)</div>
-                                <div class="metric-val" id="addonOpt1MT">0.000 MT</div>
-                                <div class="metric-sub" id="addonOpt1Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card" style="border-color: var(--success-color);">
-                                <div class="metric-sub">Standard Slabs (Opt 2)</div>
-                                <div class="metric-val" id="addonOpt2MT">0.000 MT</div>
-                                <div class="metric-sub" id="addonOpt2Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-sub">EA Weight</div>
-                                <div class="metric-val" id="addonEAMT">0.000 MT</div>
-                                <div class="metric-sub" id="addonEAKg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            </div>
-
-            <!-- 3. EXPORT, PRINT & EMAIL OPTIONS -->
-            <div class="card">
-                <h4 style="color: var(--accent-color); margin-top: 0; font-size: 15px;">🚀 Export, Print & Email Options</h4>
-                <div class="row" style="gap: 10px;">
-                    <div class="col"><button onclick="printReportWindow()" style="margin-bottom: 0;">🖨️ Print / Save Table as PDF</button></div>
-                    <div class="col"><button onclick="exportFilteredExcel()" style="margin-bottom: 0; background: var(--success-color); color:#0f172a;">📥 Download Filtered Excel (.xlsx)</button></div>
-                </div>
             </div>
         </div>
     </div>
@@ -340,10 +259,7 @@
         let filteredData = [];
         let activeFileName = "None";
         let detectedCols = { veh: '', qty: '', date: '', unit: '', desc: '', bill: '' };
-
         let mainSelectedBills = [];
-        let addonSelectedBills = [];
-        let addonSelectedTrips = [];
 
         function updateClock() {
             const now = new Date();
@@ -362,18 +278,6 @@
             if (!event.target.closest('.streamlit-pill-box')) {
                 document.querySelectorAll('.pill-dropdown-content').forEach(d => d.classList.remove('show'));
             }
-        }
-
-        function parseDescriptionWeight(descText, qty) {
-            const d = String(descText || '').toUpperCase();
-            const q = parseFloat(qty) || 0;
-            const matchKg = d.match(/\b(\d+(?:\.\d+)?)\s*KG\b/);
-            if (matchKg) return { wt: q * parseFloat(matchKg[1]), label: `EA (${matchKg[1]} Kg)` };
-            const matchGm = d.match(/\b(\d+(?:\.\d+)?)\s*(?:GM|GRAM)\b/);
-            if (matchGm) return { wt: q * (parseFloat(matchGm[1]) / 1000.0), label: `EA (${matchGm[1]} Gm)` };
-            const matchLtr = d.match(/\b(\d+(?:\.\d+)?)\s*(?:LTR|LITRE)\b/);
-            if (matchLtr) return { wt: q * parseFloat(matchLtr[1]), label: `EA (${matchLtr[1]} Ltr)` };
-            return { wt: 0, label: "EA" };
         }
 
         function saveColumnPreferences() {
@@ -402,6 +306,7 @@
             vaultRef.once('value', (snapshot) => {
                 const data = snapshot.val();
                 const select = document.getElementById('vaultFilesList');
+                if(!select) return;
                 select.innerHTML = '';
                 if (!data) return;
 
@@ -443,7 +348,6 @@
                     cleanData = sanitizeRowKeys(cleanData);
 
                     const saveMode = document.getElementById('saveMode').value;
-
                     if (saveMode.includes("append") && activeData.length > 0) {
                         cleanData = [...activeData, ...cleanData];
                         activeFileName = "Merged_" + file.name;
@@ -512,15 +416,12 @@
             });
         }
 
-        rtdb.ref('vault_files').on('value', () => {
-            cleanupAndRefreshVault();
-        });
-
         function setActiveDataset(data, fileName) {
             activeData = data;
             filteredData = data;
             activeFileName = fileName;
-            document.getElementById('activeFileName').innerText = fileName;
+            const activeFileEl = document.getElementById('activeFileName');
+            if(activeFileEl) activeFileEl.innerText = fileName;
 
             if (data.length > 0) {
                 const cols = Object.keys(data[0]);
@@ -528,17 +429,13 @@
                 populateDropdowns(cols);
                 extractBillingDates();
                 filterAndRenderData();
-                addonInitVehicles();
             }
         }
 
         function autoDetectColumns(cols) {
             detectedCols = { veh: '', qty: '', date: '', unit: '', desc: '', bill: '' };
-
             const savedBill = localStorage.getItem('plant2100_pref_bill');
-            if (savedBill && cols.includes(savedBill)) {
-                detectedCols.bill = savedBill;
-            }
+            if (savedBill && cols.includes(savedBill)) detectedCols.bill = savedBill;
 
             cols.forEach(c => {
                 const cl = c.toLowerCase();
@@ -547,18 +444,12 @@
                 if (!detectedCols.date && cl.includes("billing date")) detectedCols.date = c;
                 if (!detectedCols.unit && (cl.includes("unit") || cl.includes("uom"))) detectedCols.unit = c;
                 if (!detectedCols.desc && (cl.includes("description") || cl.includes("text") || cl.includes("desc"))) detectedCols.desc = c;
-                
-                // STRICT BILLING DOCUMENT DETECTION (Excludes Item / Line / Doc. Item)
                 if (!detectedCols.bill && !savedBill && cl.includes("billing document") && !cl.includes("item") && !cl.includes("line")) {
                     detectedCols.bill = c;
                 }
             });
-
             if (!detectedCols.bill && !savedBill) {
-                detectedCols.bill = cols.find(c => {
-                    const cl = c.toLowerCase();
-                    return cl.includes("document") && !cl.includes("item") && !cl.includes("line");
-                }) || cols[0];
+                detectedCols.bill = cols.find(c => c.toLowerCase().includes("document") && !c.toLowerCase().includes("item")) || cols[0];
             }
             if (!detectedCols.date) detectedCols.date = cols.find(c => c.toLowerCase().includes("date")) || '';
         }
@@ -567,6 +458,7 @@
             const vehSel = document.getElementById('selVehCol');
             const qtySel = document.getElementById('selQtyCol');
             const billSel = document.getElementById('selBillCol');
+            if(!vehSel) return;
             vehSel.innerHTML = ''; qtySel.innerHTML = ''; billSel.innerHTML = '';
 
             const savedVeh = localStorage.getItem('plant2100_pref_veh');
@@ -587,12 +479,10 @@
         }
 
         function extractBillingDates() {
-            if (!detectedCols.date || !activeData.length) {
-                document.getElementById('activeFileDates').innerText = "N/A";
-                return;
-            }
+            if (!detectedCols.date || !activeData.length) return;
             const dates = [...new Set(activeData.map(r => String(r[detectedCols.date]).split(' ')[0]))].filter(d => d && d !== '#');
-            document.getElementById('activeFileDates').innerText = dates.join(', ') || "N/A";
+            const dateEl = document.getElementById('activeFileDates');
+            if(dateEl) dateEl.innerText = dates.join(', ') || "N/A";
         }
 
         function filterAndRenderData() {
@@ -608,10 +498,8 @@
         function processVehicleOptions() {
             const vehCol = document.getElementById('selVehCol').value;
             if (!vehCol || !filteredData.length) return;
-
             let vehicles = [...new Set(filteredData.map(r => String(r[vehCol]).trim()))]
                             .filter(v => v && v !== '#' && !v.toLowerCase().includes("total")).sort();
-
             window.allVehiclesCache = vehicles;
             filterVehiclesList();
         }
@@ -619,11 +507,10 @@
         function filterVehiclesList() {
             const q = document.getElementById('vehSearch').value.toLowerCase().trim();
             const vehSel = document.getElementById('selVehicle');
+            if(!vehSel) return;
             vehSel.innerHTML = '';
-            
             let matches = window.allVehiclesCache || [];
             if (q) matches = matches.filter(v => v.toLowerCase().includes(q) || v.toLowerCase().endsWith(q));
-
             matches.forEach(v => vehSel.add(new Option(v, v)));
             processTripSequences();
         }
@@ -633,24 +520,17 @@
             const vehCol = document.getElementById('selVehCol').value;
             const billCol = document.getElementById('selBillCol').value;
             const dateSel = document.getElementById('selDate');
-            
             if (!veh) return;
             let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
 
-            if (detectedCols.date) {
+            if (detectedCols.date && dateSel) {
                 const dates = ["All Dates", ...new Set(rows.map(r => String(r[detectedCols.date])))].filter(d => d);
                 dateSel.innerHTML = '';
                 dates.forEach(d => dateSel.add(new Option(d, d)));
             }
 
-            const chosenDate = dateSel.value;
-            if (chosenDate && chosenDate !== "All Dates" && detectedCols.date) {
-                rows = rows.filter(r => String(r[detectedCols.date]) === chosenDate);
-            }
-
             if (billCol) {
                 let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
-                
                 let numBills = bills.map(b => {
                     let nums = b.match(/\d+/g);
                     return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
@@ -667,7 +547,6 @@
                     prevNum = item.num > 0 ? item.num : prevNum;
                 });
                 if (curTrip.length) trips.push(curTrip);
-
                 window.currentTripsMap = trips;
                 renderMainTripRadioGroup(trips, bills);
             }
@@ -676,6 +555,7 @@
         function renderMainTripRadioGroup(trips, allBills) {
             const area = document.getElementById('tripSelectionArea');
             const group = document.getElementById('tripRadioGroup');
+            if(!area || !group) return;
             group.innerHTML = '';
             area.style.display = 'block';
 
@@ -703,6 +583,7 @@
 
         function renderMainPills() {
             const box = document.getElementById('mainBillPillBox');
+            if(!box) return;
             let html = '';
             mainSelectedBills.forEach(b => {
                 html += `<div class="streamlit-pill">${b} <span onclick="removeMainBill('${b}', event)">×</span></div>`;
@@ -742,8 +623,6 @@
             const vehCol = document.getElementById('selVehCol').value;
             const qtyCol = document.getElementById('selQtyCol').value;
             const billCol = document.getElementById('selBillCol').value;
-            const scope = document.getElementById('calcModeScope').value;
-
             if (!veh || !vehCol || !qtyCol) return;
 
             let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
@@ -751,445 +630,128 @@
                 rows = rows.filter(r => mainSelectedBills.includes(String(r[billCol])));
             }
 
-            let bag50 = 0, bag25 = 0, eaQty = 0, eaWeight = 0;
+            let bag50 = 0, bag25 = 0, eaQty = 0;
             rows.forEach(r => {
                 let q = parseFloat(r[qtyCol]) || 0;
+                let d = String(r[detectedCols.desc] || '').toUpperCase();
                 let u = String(r[detectedCols.unit] || 'BAG').toUpperCase();
-                let d = String(r[detectedCols.desc] || '').toUpperCase();
-
-                if (scope === 'bags' && u.includes('EA')) return;
-                if (scope === 'ea' && !u.includes('EA')) return;
-
                 if (u.includes('EA')) {
                     eaQty += q;
-                    let parsed = parseDescriptionWeight(d, q);
-                    eaWeight += parsed.wt;
                 } else {
-                    if (d.includes('25')) { bag25 += q; } 
-                    else { bag50 += q; }
+                    if (d.includes('25')) { bag25 += q; } else { bag50 += q; }
                 }
             });
 
-            let totBags = bag50 + bag25;
-            let bagWtOpt1 = (bag50 * 50.120) + (bag25 * 25.120);
-            let bagWtOpt2 = (bag50 * 50.0) + (bag25 * 25.0);
-            let totalOpt1 = bagWtOpt1 + eaWeight;
-            let totalOpt2 = bagWtOpt2 + eaWeight;
-
-            document.getElementById('m50Bag').innerText = bag50.toLocaleString() + " Bags";
-            document.getElementById('m25Bag').innerText = bag25.toLocaleString() + " Bags";
-            document.getElementById('mTotBag').innerText = totBags.toLocaleString() + " Bags";
-            document.getElementById('mEAQty').innerText = eaQty.toLocaleString();
-            document.getElementById('mOpt1MT').innerText = (totalOpt1 / 1000.0).toFixed(3) + " MT";
-            document.getElementById('mOpt1Kg').innerText = `↑ ${totalOpt1.toFixed(2)} Kgs`;
-            document.getElementById('mOpt2MT').innerText = (totalOpt2 / 1000.0).toFixed(3) + " MT";
-            document.getElementById('mOpt2Kg').innerText = `↑ ${totalOpt2.toFixed(2)} Kgs`;
-            document.getElementById('mEAMT').innerText = (eaWeight / 1000.0).toFixed(3) + " MT";
-            document.getElementById('mEAKg').innerText = `↑ ${eaWeight.toFixed(2)} Kgs`;
+            const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+            setVal('m50Bag', bag50.toLocaleString() + " Bags");
+            setVal('m25Bag', bag25.toLocaleString() + " Bags");
+            setVal('mTotBag', (bag50 + bag25).toLocaleString() + " Bags");
+            setVal('mEAQty', eaQty.toLocaleString());
         }
 
-        // =====================================================================
-        // TRIPLE-MODE ADD-ON MODULE LOGIC
-        // =====================================================================
-        function addonInitVehicles() {
-            if (!filteredData.length) return;
-            const vehCol = detectedCols.veh || Object.keys(filteredData[0])[0];
-            let vehicles = [...new Set(filteredData.map(r => String(r[vehCol]).trim()))].filter(v => v && v !== '#').sort();
-            window.addonVehCache = vehicles;
-            addonFilterVehicles();
-        }
+        // --- UNIQUE FONT HELPER FOR WHATSAPP ---
+        function applyCleanFont(text, styleType) {
+            if (!text) return "";
+            const maps = {
+                serifBold: { upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙", lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳", digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗" },
+                sansBold: { upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝗨𝗩𝑊𝗫𝗬𝑍", lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇", digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿" },
+                boldItalic: { upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁", lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝐥𝒎𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛", digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗" }
+            };
+            let activeMap = maps.serifBold;
+            if (styleType === 1) activeMap = maps.sansBold;
+            else if (styleType === 2) activeMap = maps.boldItalic;
 
-        function addonFilterVehicles() {
-            const q = document.getElementById('addonVehSearch').value.toLowerCase().trim();
-            const sel = document.getElementById('addonSelVehicle');
-            sel.innerHTML = '';
-            let matches = window.addonVehCache || [];
-            if (q) matches = matches.filter(v => v.toLowerCase().includes(q) || v.toLowerCase().endsWith(q));
-            matches.forEach(v => sel.add(new Option(v, v)));
-            addonProcessTrips();
-        }
+            const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const normalLower = "abcdefghijklmnopqrstuvwxyz";
+            const normalDigits = "0123456789";
 
-        function addonProcessTrips() {
-            const veh = document.getElementById('addonSelVehicle').value;
-            const vehCol = detectedCols.veh;
-            const billCol = document.getElementById('selBillCol').value;
-            if (!veh || !vehCol || !billCol) return;
-
-            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
-            let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
-
-            let numBills = bills.map(b => {
-                let nums = b.match(/\d+/g);
-                return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
-            }).sort((a,b) => a.num - b.num);
-
-            let trips = [], curTrip = [], prevNum = null;
-            numBills.forEach(item => {
-                if (prevNum === null || (item.num - prevNum <= 3)) {
-                    curTrip.push(item.orig);
-                } else {
-                    trips.push(curTrip);
-                    curTrip = [item.orig];
-                }
-                prevNum = item.num > 0 ? item.num : prevNum;
-            });
-            if (curTrip.length) trips.push(curTrip);
-
-            window.addonTripsMap = trips;
-            window.addonAllBills = bills;
-
-            let bannerText = trips.map((grp, idx) => `Trip ${idx+1}: ${grp[0]} to ${grp[grp.length-1]}`).join(" | ");
-            document.getElementById('addonAutoDetectedBanner').innerHTML = `🔍 Auto-Detected Trips: ${bannerText}`;
-
-            addonRenderSelectionUI();
-        }
-
-        function addonRenderSelectionUI() {
-            const style = document.querySelector('input[name="addonStyle"]:checked').value;
-            const container = document.getElementById('addonDynamicUI');
-            container.innerHTML = '';
-            const trips = window.addonTripsMap || [];
-
-            if (style === 'radio') {
-                container.innerHTML = `<label>👉 Select an individual trip:</label><div class="radio-group">`;
-                trips.forEach((grp, idx) => {
-                    container.innerHTML += `<label><input type="radio" name="addonTripRad" value="${idx}" ${idx===0?'checked':''} onchange="addonSyncBills()"> Trip ${idx+1} (${grp[0]} to ${grp[grp.length-1]})</label>`;
-                });
-                container.innerHTML += `</div>`;
-            } else if (style === 'checkbox') {
-                container.innerHTML = `<label>👉 Tick multiple trips to combine them instantly:</label><div class="checkbox-group">`;
-                trips.forEach((grp, idx) => {
-                    container.innerHTML += `<label><input type="checkbox" name="addonTripChk" value="${idx}" ${idx===0?'checked':''} onchange="addonSyncBills()"> Trip ${idx+1} (${grp.length} bills)</label>`;
-                });
-                container.innerHTML += `</div>`;
-            } else {
-                container.innerHTML = `<label>👉 Select one or multiple trips from Dropdown:</label><div class="streamlit-pill-box" id="addonTripPillBox" onclick="togglePillDropdown('addonTripDropdown')"><span style="color:var(--subtext-color); font-size:12px;">Select trips...</span><div class="pill-dropdown-content" id="addonTripDropdown"></div></div>`;
-                
-                addonSelectedTrips = trips.map((_, idx) => idx);
-                renderAddonTripPills();
+            let result = "";
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let uIdx = normalUpper.indexOf(char);
+                let lIdx = normalLower.indexOf(char);
+                let dIdx = normalDigits.indexOf(char);
+                if (uIdx !== -1) result += activeMap.upper[uIdx] || char;
+                else if (lIdx !== -1) result += activeMap.lower[lIdx] || char;
+                else if (dIdx !== -1) result += activeMap.digits[dIdx] || char;
+                else result += char;
             }
-            addonSyncBills();
+            return result;
         }
 
-        function renderAddonTripPills() {
-            const box = document.getElementById('addonTripPillBox');
-            if(!box) return;
-            const trips = window.addonTripsMap || [];
+        // --- WHATSAPP DISPATCH TRIGGER (WORKING FLOW) ---
+        function sendWhatsAppDispatch() {
+            const mobile = document.getElementById('waMobileNumber').value.trim();
+            let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
             
-            let html = '';
-            addonSelectedTrips.forEach(idx => {
-                if(trips[idx]) {
-                    html += `<div class="streamlit-pill">Trip ${idx+1} <span onclick="removeAddonTrip(${idx}, event)">×</span></div>`;
-                }
-            });
-            if(addonSelectedTrips.length === 0) {
-                html += `<span style="color: var(--subtext-color); font-size: 12px;">Select trips...</span>`;
-            }
-            box.innerHTML = html + `<div class="pill-dropdown-content" id="addonTripDropdown"></div>`;
-
-            const dropEl = document.getElementById('addonTripDropdown');
-            trips.forEach((grp, idx) => {
-                let isSel = addonSelectedTrips.includes(idx);
-                dropEl.innerHTML += `<div class="pill-option" onclick="toggleAddonTrip(${idx}, event)" style="${isSel ? 'background:rgba(56,189,248,0.15); color:#38bdf8;' : ''}">Trip ${idx+1} (${grp[0]} to ${grp[grp.length-1]}) ${isSel ? '✓' : ''}</div>`;
-            });
-        }
-
-        function toggleAddonTrip(idx, e) {
-            e.stopPropagation();
-            if(addonSelectedTrips.includes(idx)) {
-                addonSelectedTrips = addonSelectedTrips.filter(i => i !== idx);
-            } else {
-                addonSelectedTrips.push(idx);
-            }
-            renderAddonTripPills();
-            addonSyncBills();
-        }
-
-        function removeAddonTrip(idx, e) {
-            e.stopPropagation();
-            addonSelectedTrips = addonSelectedTrips.filter(i => i !== idx);
-            renderAddonTripPills();
-            addonSyncBills();
-        }
-
-        function addonSyncBills() {
-            const style = document.querySelector('input[name="addonStyle"]:checked').value;
-            const trips = window.addonTripsMap || [];
-            let targetBills = [];
-
-            if (style === 'radio') {
-                const checked = document.querySelector('input[name="addonTripRad"]:checked');
-                if (checked && trips[checked.value]) targetBills = trips[checked.value];
-            } else if (style === 'checkbox') {
-                const checkedBoxes = document.querySelectorAll('input[name="addonTripChk"]:checked');
-                checkedBoxes.forEach(chk => {
-                    if (trips[chk.value]) targetBills.push(...trips[chk.value]);
-                });
-            } else {
-                addonSelectedTrips.forEach(idx => {
-                    if (trips[idx]) targetBills.push(...trips[idx]);
-                });
+            if (!veh) {
+                alert("Kripya pehle vehicle select karein.");
+                return;
             }
 
-            addonSelectedBills = [...targetBills];
-            renderAddonBillPills();
-            addonCalculate();
-        }
+            let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
+            let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
+            let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
+            let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
 
-        function renderAddonBillPills() {
-            const box = document.getElementById('addonBillPillBox');
-            let html = '';
-            addonSelectedBills.forEach(b => {
-                html += `<div class="streamlit-pill">${b} <span onclick="removeAddonBill('${b}', event)">×</span></div>`;
-            });
-            if(addonSelectedBills.length === 0) {
-                html += `<span style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>`;
-            }
-            box.innerHTML = html + `<div class="pill-dropdown-content" id="addonBillDropdown"></div>`;
+            let activeBills = [];
+            const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
+            addonPills.forEach(pill => { let text = pill.textContent.replace('×', '').trim(); if (text) activeBills.push(text); });
 
-            const dropEl = document.getElementById('addonBillDropdown');
-            (window.addonAllBills || []).forEach(b => {
-                let isSel = addonSelectedBills.includes(b);
-                dropEl.innerHTML += `<div class="pill-option" onclick="toggleAddonBill('${b}', event)" style="${isSel ? 'background:rgba(56,189,248,0.15); color:#38bdf8;' : ''}">${b} ${isSel ? '✓' : ''}</div>`;
-            });
-        }
-
-        function toggleAddonBill(b, e) {
-            e.stopPropagation();
-            if(addonSelectedBills.includes(b)) {
-                addonSelectedBills = addonSelectedBills.filter(item => item !== b);
-            } else {
-                addonSelectedBills.push(b);
-            }
-            renderAddonBillPills();
-            addonCalculate();
-        }
-
-        function removeAddonBill(b, e) {
-            e.stopPropagation();
-            addonSelectedBills = addonSelectedBills.filter(item => item !== b);
-            renderAddonBillPills();
-            addonCalculate();
-        }
-
-        function addonCalculate() {
-            const veh = document.getElementById('addonSelVehicle').value;
-            const vehCol = detectedCols.veh;
-            const qtyCol = detectedCols.qty;
-            const billCol = document.getElementById('selBillCol').value;
-
-            if (!veh || !filteredData.length) return;
-
-            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
-            if (addonSelectedBills.length && billCol) {
-                rows = rows.filter(r => addonSelectedBills.includes(String(r[billCol])));
+            if (activeBills.length === 0) {
+                const mainPills = document.querySelectorAll('#mainBillPillBox .streamlit-pill');
+                mainPills.forEach(pill => { let text = pill.textContent.replace('×', '').trim(); if (text) activeBills.push(text); });
             }
 
-            let s50 = 0, s25 = 0, eaQty = 0, eaWt = 0;
-            rows.forEach(r => {
-                let q = parseFloat(r[qtyCol]) || 0;
-                let d = String(r[detectedCols.desc] || '').toUpperCase();
-                let u = String(r[detectedCols.unit] || '').toUpperCase();
-                if (u.includes('EA')) {
-                    eaQty += q;
-                    let parsed = parseDescriptionWeight(d, q);
-                    eaWt += parsed.wt;
-                } else if (d.includes('25')) {
-                    s25 += q;
-                } else {
-                    s50 += q;
-                }
-            });
+            const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
+            const currentDate = new Date().toLocaleDateString('en-IN');
+            const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
-            let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
-            let opt1Total = bagsWt1 + eaWt;
-            let opt2Total = bagsWt2 + eaWt;
+            let charSum = 0;
+            for (let i = 0; i < veh.length; i++) { charSum += veh.charCodeAt(i); }
+            let fontStyleIndex = charSum % 3;
 
-            document.getElementById('addonLiveTotalsTitle').innerText = `📈 Live Totals for ${veh} (Selection Active)`;
-            document.getElementById('addonM50').innerText = s50.toLocaleString() + " Bags";
-            document.getElementById('addonM25').innerText = s25.toLocaleString() + " Bags";
-            document.getElementById('addonMTot').innerText = (s50 + s25).toLocaleString() + " Bags";
-            document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
-            document.getElementById('addonOpt1MT').innerText = (opt1Total / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonOpt1Kg').innerText = `↑ ${opt1Total.toFixed(2)} Kgs`;
-            document.getElementById('addonOpt2MT').innerText = (opt2Total / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonOpt2Kg').innerText = `↑ ${opt2Total.toFixed(2)} Kgs`;
-            document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
+            const themes = [
+                { title: "EXPRESS DISPATCH", emoji: "🚀" },
+                { title: "PRIORITY LOGISTICS", emoji: "⚡" },
+                { title: "SECURE TRANSIT", emoji: "🛡️" }
+            ];
+            let currentTheme = themes[charSum % themes.length];
+
+            let styledVeh = applyCleanFont("Vehicle No: " + veh, fontStyleIndex);
+            let styledBags50 = applyCleanFont("50 Kg Bags: " + bag50, fontStyleIndex);
+            let styledBags25 = applyCleanFont("25 Kg Bags: " + bag25, fontStyleIndex);
+            let styledEa = applyCleanFont("EA Unit (Loose): " + eaQty, fontStyleIndex);
+            let styledTotal = applyCleanFont("Total Bags: " + totalBags, fontStyleIndex);
+            let styledBills = applyCleanFont("Bill Numbers: " + billsText, fontStyleIndex);
+
+            let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
+
+            let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
+                          "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
+                          "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                          currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
+                          "🔹 " + styledVeh + "\n" +
+                          "📌 *Status:* ✅ Approved for Dispatch\n\n" +
+                          "📦 " + styledBags50 + "\n" +
+                          "📦 " + styledBags25 + "\n" +
+                          "📦 " + styledEa + "\n" +
+                          "📊 " + styledTotal + "\n" +
+                          "🧾 " + styledBills + "\n\n" +
+                          "📅 *Date:* " + currentDate + " | 🕒 *Time:* " + currentTime + "\n\n" +
+                          "━━━━━━━━━━━━━━━━━━━━━━\n" +
+                          "✍️ *Authorized Signature:*\n" +
+                          humanSign + "\n" +
+                          "──➦ [ PNPL SCM MOGA Hub ]\n" +
+                          "━━━━━━━━━━━━━━━━━━━━━━";
+
+            let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
+            window.location.href = url;
         }
 
-        function printReportWindow() { window.print(); }
-        function exportFilteredExcel() {
-            if (!filteredData.length) return alert("Export karne ke liye data nahi hai.");
-            const ws = XLSX.utils.json_to_sheet(filteredData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Tonnage Report");
-            XLSX.writeFile(wb, `Tonnage_Report_Plant2100_${new Date().toISOString().slice(0,10)}.xlsx`);
+        window.onload = function() {
+            cleanupAndRefreshVault();
         }
     </script>
 </body>
 </html>
-
-<!-- WhatsApp Share Component Card (Working Click Flow + PNPL SCM MOGA & Unique Fonts) -->
-<div class="card" style="border-color: #25d366; background: #0f172a;">
-    <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
-    <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
-        1 click me 50kg, 25kg, EA unit, total bags aur exact bill numbers ke sath WhatsApp alert bhechein.
-    </p>
-    <div class="row">
-        <div class="col">
-            <input type="text" id="waMobileNumber" placeholder="Enter Mobile No. (e.g., 919876543210)" style="margin-bottom: 8px;">
-        </div>
-        <div class="col">
-            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0;">
-                🚀 Send WhatsApp Message
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-// Helper function to apply high-readability clean fonts dynamically per vehicle
-function applyCleanFont(text, styleType) {
-    if (!text) return "";
-    const maps = {
-        serifBold: {
-            upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙",
-            lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳",
-            digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
-        },
-        sansBold: {
-            upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝐔𝗩𝑊𝗫𝗬𝑍",
-            lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇",
-            digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿"
-        },
-        boldItalic: {
-            upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
-            lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝐥𝒎𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
-            digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
-        }
-    };
-    let activeMap = maps.serifBold;
-    if (styleType === 1) activeMap = maps.sansBold;
-    else if (styleType === 2) activeMap = maps.boldItalic;
-
-    const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const normalLower = "abcdefghijklmnopqrstuvwxyz";
-    const normalDigits = "0123456789";
-
-    let result = "";
-    for (let i = 0; i < text.length; i++) {
-        let char = text[i];
-        let uIdx = normalUpper.indexOf(char);
-        let lIdx = normalLower.indexOf(char);
-        let dIdx = normalDigits.indexOf(char);
-        if (uIdx !== -1) result += activeMap.upper[uIdx] || char;
-        else if (lIdx !== -1) result += activeMap.lower[lIdx] || char;
-        else if (dIdx !== -1) result += activeMap.digits[dIdx] || char;
-        else result += char;
-    }
-    return result;
-}
-
-function sendWhatsAppDispatch() {
-    const mobile = document.getElementById('waMobileNumber').value.trim();
-    
-    // Vehicle check
-    let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
-    
-    if (!veh) {
-        alert("Kripya pehle vehicle select karein.");
-        return;
-    }
-
-    // Total bags check
-    let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
-    let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
-    let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
-    let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
-
-    // --- BULLETPROOF BILL NUMBER EXTRACTION ---
-    let activeBills = [];
-
-    // 1. Pehle dekhenge ki Addon pill box me kaunse bills active hain
-    const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
-    addonPills.forEach(pill => {
-        let text = pill.textContent.replace('×', '').trim();
-        if (text) activeBills.push(text);
-    });
-
-    // 2. Agar addon me nahi mile, toh Main pill box ke bills check karenge
-    if (activeBills.length === 0) {
-        const mainPills = document.querySelectorAll('#mainBillPillBox .streamlit-pill');
-        mainPills.forEach(pill => {
-            let text = pill.textContent.replace('×', '').trim();
-            if (text) activeBills.push(text);
-        });
-    }
-
-    // 3. Agar fir bhi na mile, toh global selected arrays check karenge
-    if (activeBills.length === 0) {
-        if (window.addonSelectedBills && window.addonSelectedBills.length > 0) {
-            activeBills = window.addonSelectedBills;
-        } else if (window.mainSelectedBills && window.mainSelectedBills.length > 0) {
-            activeBills = window.mainSelectedBills;
-        }
-    }
-
-    const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
-    const currentDate = new Date().toLocaleDateString('en-IN');
-    const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-    // --- UNIQUE DYNAMIC READABLE FONT & THEME PER VEHICLE ---
-    let charSum = 0;
-    for (let i = 0; i < veh.length; i++) {
-        charSum += veh.charCodeAt(i);
-    }
-    let fontStyleIndex = charSum % 3;
-
-    const themes = [
-        { title: "EXPRESS DISPATCH", emoji: "🚀" },
-        { title: "PRIORITY LOGISTICS", emoji: "⚡" },
-        { title: "SECURE TRANSIT", emoji: "🛡️" }
-    ];
-    let currentTheme = themes[charSum % themes.length];
-
-    let styledVeh = applyCleanFont("Vehicle No: " + veh, fontStyleIndex);
-    let styledBags50 = applyCleanFont("50 Kg Bags: " + bag50, fontStyleIndex);
-    let styledBags25 = applyCleanFont("25 Kg Bags: " + bag25, fontStyleIndex);
-    let styledEa = applyCleanFont("EA Unit (Loose): " + eaQty, fontStyleIndex);
-    let styledTotal = applyCleanFont("Total Bags: " + totalBags, fontStyleIndex);
-    let styledBills = applyCleanFont("Bill Numbers: " + billsText, fontStyleIndex);
-
-    let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
-
-    // Clean Message Format with PNPL SCM MOGA & Signature
-    let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
-                  "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
-                  "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-                  currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
-                  "🔹 " + styledVeh + "\n" +
-                  "📌 *Status:* ✅ Approved for Dispatch\n\n" +
-                  "📦 " + styledBags50 + "\n" +
-                  "📦 " + styledBags25 + "\n" +
-                  "📦 " + styledEa + "\n" +
-                  "📊 " + styledTotal + "\n" +
-                  "🧾 " + styledBills + "\n\n" +
-                  "📅 *Date:* " + currentDate + " | 🕒 *Time:* " + currentTime + "\n\n" +
-                  "━━━━━━━━━━━━━━━━━━━━━━\n" +
-                  "✍️ *Authorized Signature:*\n" +
-                  humanSign + "\n" +
-                  "──➦ [ PNPL SCM MOGA Hub ]\n" +
-                  "━━━━━━━━━━━━━━━━━━━━━━";
-
-    // Direct App Scheme URL (Exact same click flow as your original code)
-    let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
-    
-    // Direct trigger without opening new tab
-    window.location.href = url;
-}
-</script>
-
-            
-    
