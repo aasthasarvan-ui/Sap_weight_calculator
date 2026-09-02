@@ -248,75 +248,74 @@
             </div>
 
             <!-- 2. TRIPLE-MODE ADVANCED ADD-ON MODULE -->
-    <div class="card">
-        <details open>
-            <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
-            <div style="margin-top: 12px;">
-                <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
-                <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
-                
-                <label>🚛 Select Vehicle:</label>
-                <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
+<div class="card">
+    <details open>
+        <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
+        <div style="margin-top: 12px;">
+            <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
+            <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
+            
+            <label>🚛 Select Vehicle:</label>
+            <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
 
-                <!-- 🔽 YAHAN CATEGORY SCOPE DROPDOWN ADD KIYA GAYA HAI 🔽 -->
-                <label style="margin-top: 10px;">🔍 [Add-on] Category Scope:</label>
-                <select id="addonCalcModeScope" onchange="addonCalculate()">
-                <select id="addonCalcModeScope" onchange="addonProcessTrips(); addonCalculate();">
-                    <option value="all">All (Bags + EA Combined)</option>
-                    <option value="bags">Only BAGS</option>
-                    <option value="ea">Only EA (Loose Invoices)</option>
-                </select>
-                <!-- 🔼 ------------------------------------------------ 🔼 -->
+            <!-- 🔽 YAHAN CATEGORY SCOPE DROPDOWN ADD KIYA GAYA HAI 🔽 -->
+            <label style="margin-top: 10px;">🔍 [Add-on] Category Scope:</label>
+            <select id="addonCalcModeScope" onchange="addonProcessTrips(); addonCalculate();">
+                <option value="all">All (Bags + EA Combined)</option>
+                <option value="bags">Only BAGS</option>
+                <option value="ea">Only EA (Loose Invoices)</option>
+            </select>
+            <!-- 🔼 ------------------------------------------------ 🔼 -->
+        </div>
+
+        <div class="trip-auto-banner" id="addonAutoDetectedBanner">
+            🔍 Auto-Detected Trips: None
+        </div>
+
+        <label>Choose Selection Style:</label>
+        <div class="radio-group" id="addonStyleGroup">
+            <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
+            <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
+            <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
+        </div>
+
+        <div id="addonDynamicUI" style="margin-top: 12px;"></div>
+
+        <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
+        <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
+            <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
+            <div class="pill-dropdown-content" id="addonBillDropdown"></div>
+        </div>
+
+        <!-- ADD-ON LIVE METRICS -->
+        <div id="addonMetricsOutput" style="margin-top: 15px; background: #0b0f19; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <h4 id="addonLiveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Totals for Vehicle</h4>
+            <div class="metric-grid">
+                <div class="metric-card"><div class="metric-sub">50 Kg Bags</div><div class="metric-val" id="addonM50">0 Bags</div></div>
+                <div class="metric-card"><div class="metric-sub">25 Kg Bags</div><div class="metric-val" id="addonM25">0 Bags</div></div>
+                <div class="metric-card"><div class="metric-sub">Total Bags</div><div class="metric-val" id="addonMTot">0 Bags</div></div>
+                <div class="metric-card"><div class="metric-sub">EA Quantity</div><div class="metric-val" id="addonMEA">0</div></div>
             </div>
-
-            <div class="trip-auto-banner" id="addonAutoDetectedBanner">
-                🔍 Auto-Detected Trips: None
+            <div class="metric-grid">
+                <div class="metric-card" style="border-color: var(--accent-color);">
+                    <div class="metric-sub">Precision Scale (Opt 1)</div>
+                    <div class="metric-val" id="addonOpt1MT">0.000 MT</div>
+                    <div class="metric-sub" id="addonOpt1Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                </div>
+                <div class="metric-card" style="border-color: var(--success-color);">
+                    <div class="metric-sub">Standard Slabs (Opt 2)</div>
+                    <div class="metric-val" id="addonOpt2MT">0.000 MT</div>
+                    <div class="metric-sub" id="addonOpt2Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-sub">EA Weight</div>
+                    <div class="metric-val" id="addonEAMT">0.000 MT</div>
+                    <div class="metric-sub" id="addonEAKg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                </div>
             </div>
-
-            <label>Choose Selection Style:</label>
-            <div class="radio-group" id="addonStyleGroup">
-                <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
-                <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
-                <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
-            </div>
-
-            <div id="addonDynamicUI" style="margin-top: 12px;"></div>
-
-            <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
-            <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
-                <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
-                <div class="pill-dropdown-content" id="addonBillDropdown"></div>
-            </div>
-                    <!-- ADD-ON LIVE METRICS -->
-                    <div id="addonMetricsOutput" style="margin-top: 15px; background: #0b0f19; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <h4 id="addonLiveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Totals for Vehicle</h4>
-                        <div class="metric-grid">
-                            <div class="metric-card"><div class="metric-sub">50 Kg Bags</div><div class="metric-val" id="addonM50">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">25 Kg Bags</div><div class="metric-val" id="addonM25">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">Total Bags</div><div class="metric-val" id="addonMTot">0 Bags</div></div>
-                            <div class="metric-card"><div class="metric-sub">EA Quantity</div><div class="metric-val" id="addonMEA">0</div></div>
-                        </div>
-                        <div class="metric-grid">
-                            <div class="metric-card" style="border-color: var(--accent-color);">
-                                <div class="metric-sub">Precision Scale (Opt 1)</div>
-                                <div class="metric-val" id="addonOpt1MT">0.000 MT</div>
-                                <div class="metric-sub" id="addonOpt1Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card" style="border-color: var(--success-color);">
-                                <div class="metric-sub">Standard Slabs (Opt 2)</div>
-                                <div class="metric-val" id="addonOpt2MT">0.000 MT</div>
-                                <div class="metric-sub" id="addonOpt2Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-sub">EA Weight</div>
-                                <div class="metric-val" id="addonEAMT">0.000 MT</div>
-                                <div class="metric-sub" id="addonEAKg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            </div>
-
+        </div>
+    </details>
+</div>
             <!-- 3. EXPORT, PRINT & EMAIL OPTIONS -->
             <div class="card">
                 <h4 style="color: var(--accent-color); margin-top: 0; font-size: 15px;">🚀 Export, Print & Email Options</h4>
