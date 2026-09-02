@@ -1,0 +1,1116 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Vehicle Tonnage Hub (Plant 2100)</title>
+    <!-- Embedded Styles matching exact Streamlit Dark UI -->
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --card-border: #1f2937;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-color: #f3f4f6;
+            --subtext-color: #9ca3af;
+            --border-color: #374151;
+            --success-color: #34d399;
+            --danger-color: #ef4444;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        
+        .header-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+        .live-clock-box {
+            background: #1e293b; color: #ffffff; padding: 12px 20px; border-radius: 12px;
+            font-size: 15px; font-weight: 700; border: 2px solid var(--accent-color); text-align: center;
+        }
+        
+        .card {
+            background: var(--card-bg); border-radius: 16px; border: 1px solid var(--card-border);
+            padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        
+        .banner {
+            background: rgba(30, 41, 59, 0.9); border-left: 5px solid var(--accent-color);
+            padding: 14px 20px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; line-height: 1.6;
+            border: 1px solid var(--border-color); border-left-width: 5px;
+        }
+
+        .trip-auto-banner {
+            background: #1e3a8a; border: 1px solid #3b82f6; padding: 12px 16px; border-radius: 8px;
+            font-size: 13px; color: #93c5fd; margin-bottom: 15px; font-weight: 600;
+        }
+
+        .row { display: flex; flex-wrap: wrap; gap: 15px; }
+        .col { flex: 1; min-width: 260px; }
+        
+        label { display: block; font-size: 12px; color: var(--subtext-color); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea, button {
+            width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: #0f172a; color: var(--text-color); font-size: 13px; outline: none; margin-bottom: 12px; transition: all 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        button { background: var(--accent-color); color: #0f172a; font-weight: 700; cursor: pointer; border: none; }
+        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        button.btn-danger { background: var(--danger-color); color: #fff; }
+        button.btn-secondary { background: #475569; color: #fff; }
+
+        /* Streamlit style Tag Pill Box */
+        .streamlit-pill-box {
+            background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 8px 10px; min-height: 48px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+            cursor: pointer; margin-bottom: 12px; position: relative;
+        }
+        .streamlit-pill {
+            background: #ef4444; color: white; padding: 4px 10px; border-radius: 6px;
+            font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+        }
+        .streamlit-pill span { cursor: pointer; font-weight: bold; opacity: 0.8; }
+        .streamlit-pill span:hover { opacity: 1; }
+        .pill-dropdown-content {
+            display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1e293b;
+            border: 1px solid var(--border-color); border-radius: 8px; z-index: 100; max-height: 150px; overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-top: 4px;
+        }
+        .pill-dropdown-content.show { display: block; }
+        .pill-option { padding: 8px 12px; font-size: 12px; cursor: pointer; color: var(--text-color); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .pill-option:hover { background: rgba(56, 189, 248, 0.2); color: var(--accent-color); }
+
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 12px 0; }
+        .metric-card { background: #0f172a; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
+        .metric-val { font-size: 22px; font-weight: 800; color: var(--text-color); margin-top: 4px; }
+        .metric-sub { font-size: 11px; color: var(--subtext-color); font-weight: 600; text-transform: uppercase; }
+
+        .table-responsive { overflow-x: auto; max-height: 400px; margin-top: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+        th, td { padding: 10px 12px; border: 1px solid var(--border-color); white-space: nowrap; }
+        th { background: #0f172a; color: var(--accent-color); position: sticky; top: 0; z-index: 10; font-weight: 700; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+        tr:hover { background: rgba(56, 189, 248, 0.05); }
+
+        .radio-group, .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 12px; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .radio-group label, .checkbox-group label { display: flex; align-items: center; gap: 6px; color: var(--text-color); cursor: pointer; margin-bottom: 0; text-transform: none; font-weight: 500; }
+        
+        details summary { cursor: pointer; font-weight: 700; color: var(--accent-color); font-size: 14px; margin-bottom: 12px; user-select: none; }
+        details summary:hover { color: var(--accent-hover); }
+        hr { border-color: var(--border-color); margin: 20px 0; }
+    </style>
+
+    <!-- SheetJS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <!-- HEADER & LIVE CLOCK -->
+    <div class="header-hero">
+        <div>
+            <h2 style="margin: 0; color: var(--text-color); font-size: 22px;">🚚 Enterprise Vehicle Tonnage Hub (Plant 2100)</h2>
+            <p style="margin: 6px 0 0 0; color: var(--subtext-color); font-size: 13px;">
+                Firebase Cloud Vault Sync (Auto-Deletes files after 2 Days), Lightning-Fast Tonnage Calculators.
+            </p>
+        </div>
+        <div class="live-clock-box" id="liveClock">🕒 Initializing Clock...</div>
+    </div>
+
+    <div class="row">
+        <!-- SIDEBAR VAULT & UPLOADER -->
+        <div class="col" style="max-width: 340px;">
+            <div class="card">
+                <h4 style="margin-top:0; color: var(--accent-color); font-size: 15px; margin-bottom: 14px;">📂 Upload / Append Dispatch File</h4>
+                <label>Upload Dispatch File (.xlsx / .csv):</label>
+                <input type="file" id="fileUploader" accept=".xlsx, .xls, .csv">
+                
+                <label>Choose Save Action:</label>
+                <select id="saveMode">
+                    <option value="new">Save as New File</option>
+                    <option value="append">Append & Merge with Current (Only New Data)</option>
+                </select>
+                <button onclick="handleFileUpload()">💾 Confirm & Save to Cloud Vault</button>
+
+                <hr>
+
+                <h4 style="margin-top:0; color: var(--accent-color); font-size: 15px; margin-bottom: 14px;">🗂️ Cloud Vault Files (2-Day Expiry)</h4>
+                <label>Choose Saved File:</label>
+                <select id="vaultFilesList" style="margin-bottom: 8px;"></select>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="loadVaultFile()" style="margin-bottom: 0;">📂 Load File</button>
+                    <button class="btn-danger" onclick="deleteVaultFile()" style="margin-bottom: 0;">🗑️ Delete File</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD CONTENT -->
+        <div class="col">
+            <div class="banner" id="fileInfoBanner">
+                📂 <b>Active File Loaded:</b> <code id="activeFileName">None</code><br>
+                📅 <b>Dispatch / Billing Date(s) in File:</b> <code id="activeFileDates">N/A</code><br>
+                🏭 <b>Plant Filter:</b> <code>2100 Active</code>
+            </div>
+
+            <!-- GLOBAL SEARCH BAR -->
+            <div class="card" style="padding: 14px;">
+                <input type="text" id="globalSearch" placeholder="🔍 Global Keyword Search (Vehicle No, Customer, Material, Document)..." oninput="filterAndRenderData()" style="margin: 0;">
+            </div>
+
+            <!-- 1. VEHICLE TONNAGE CALCULATOR -->
+            <div class="card">
+                <details open>
+                    <summary>🚚 Vehicle Tonnage Calculator (Gap-Detected Synchronized Trip Audit)</summary>
+                    <div class="row" style="margin-top: 14px;">
+                        <div class="col">
+                            <label>📌 Select Vehicle Column:</label>
+                            <select id="selVehCol" onchange="saveColumnPreferences(); processVehicleOptions();"></select>
+                        </div>
+                        <div class="col">
+                            <label>📌 Select Quantity Column:</label>
+                            <select id="selQtyCol" onchange="saveColumnPreferences(); calculateSelectedTrip();"></select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label style="color: var(--success-color);">📌 Select Billing Document Column (Exact Invoice):</label>
+                            <select id="selBillCol" onchange="saveColumnPreferences(); processTripSequences();" style="border-color: var(--success-color);"></select>
+                        </div>
+                        <div class="col">
+                            <label>📅 Select Billing Date:</label>
+                            <select id="selDate" onchange="processTripSequences()"></select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label>🔎 Quick Search Vehicle (Type Last 4 Digits):</label>
+                            <input type="text" id="vehSearch" placeholder="e.g. 2680, 0440, 1765" oninput="filterVehiclesList()">
+                            <label>🚛 Select Vehicle from Suggestions:</label>
+                            <select id="selVehicle" onchange="processTripSequences()"></select>
+                        </div>
+                        <div class="col">
+                            <label>🔍 Category Scope:</label>
+                            <select id="calcModeScope" onchange="processTripSequences()">
+                                <option value="all">All (Bags + EA Combined)</option>
+                                <option value="bags">Only BAGS</option>
+                                <option value="ea">Only EA (Loose Invoices)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="tripSelectionArea" style="display: none; margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 14px;">
+                        <label>🎯 Smart Continuous Trip Sequence Detection:</label>
+                        <div class="radio-group" id="tripRadioGroup"></div>
+
+                        <label style="margin-top: 10px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
+                        <div class="streamlit-pill-box" id="mainBillPillBox" onclick="togglePillDropdown('mainBillDropdown')">
+                            <span id="mainBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
+                            <div class="pill-dropdown-content" id="mainBillDropdown"></div>
+                        </div>
+                    </div>
+
+                    <!-- LIVE METRICS DISPLAY -->
+                    <div id="metricsOutput" style="margin-top: 15px;">
+                        <h4 id="liveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Populated Totals</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card"><div class="metric-sub">50 Kg Bags</div><div class="metric-val" id="m50Bag">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">25 Kg Bags</div><div class="metric-val" id="m25Bag">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">Total Bags (50+25)</div><div class="metric-val" id="mTotBag">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">EA (Loose Qty)</div><div class="metric-val" id="mEAQty">0</div></div>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-card" style="border-color: var(--accent-color);">
+                                <div class="metric-sub">Precision Scale (Opt 1)</div>
+                                <div class="metric-val" id="mOpt1MT">0.000 MT</div>
+                                <div class="metric-sub" id="mOpt1Kg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
+                            </div>
+                            <div class="metric-card" style="border-color: var(--success-color);">
+                                <div class="metric-sub">Standard Slabs (Opt 2)</div>
+                                <div class="metric-val" id="mOpt2MT">0.000 MT</div>
+                                <div class="metric-sub" id="mOpt2Kg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-sub">EA Weight</div>
+                                <div class="metric-val" id="mEAMT">0.000 MT</div>
+                                <div class="metric-sub" id="mEAKg" style="color: var(--success-color); margin-top: 2px;">0.00 Kgs</div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- 2. TRIPLE-MODE ADVANCED ADD-ON MODULE -->
+            <div class="card">
+                <details open>
+                    <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
+                    <div style="margin-top: 12px;">
+                        <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
+                        <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
+                        
+                        <label>🚛 Select Vehicle:</label>
+                        <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
+                    </div>
+
+                    <div class="trip-auto-banner" id="addonAutoDetectedBanner">
+                        🔍 Auto-Detected Trips: None
+                    </div>
+
+                    <label>Choose Selection Style:</label>
+                    <div class="radio-group" id="addonStyleGroup">
+                        <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
+                        <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
+                        <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
+                    </div>
+
+                    <div id="addonDynamicUI" style="margin-top: 12px;"></div>
+
+                    <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
+                    <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
+                        <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
+                        <div class="pill-dropdown-content" id="addonBillDropdown"></div>
+                    </div>
+
+                    <!-- ADD-ON LIVE METRICS -->
+                    <div id="addonMetricsOutput" style="margin-top: 15px; background: #0b0f19; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h4 id="addonLiveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Totals for Vehicle</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card"><div class="metric-sub">50 Kg Bags</div><div class="metric-val" id="addonM50">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">25 Kg Bags</div><div class="metric-val" id="addonM25">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">Total Bags</div><div class="metric-val" id="addonMTot">0 Bags</div></div>
+                            <div class="metric-card"><div class="metric-sub">EA Quantity</div><div class="metric-val" id="addonMEA">0</div></div>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-card" style="border-color: var(--accent-color);">
+                                <div class="metric-sub">Precision Scale (Opt 1)</div>
+                                <div class="metric-val" id="addonOpt1MT">0.000 MT</div>
+                                <div class="metric-sub" id="addonOpt1Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                            </div>
+                            <div class="metric-card" style="border-color: var(--success-color);">
+                                <div class="metric-sub">Standard Slabs (Opt 2)</div>
+                                <div class="metric-val" id="addonOpt2MT">0.000 MT</div>
+                                <div class="metric-sub" id="addonOpt2Kg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-sub">EA Weight</div>
+                                <div class="metric-val" id="addonEAMT">0.000 MT</div>
+                                <div class="metric-sub" id="addonEAKg" style="color:var(--success-color); margin-top:2px;">0.00 Kgs</div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- 3. EXPORT, PRINT & EMAIL OPTIONS -->
+            <div class="card">
+                <h4 style="color: var(--accent-color); margin-top: 0; font-size: 15px;">🚀 Export, Print & Email Options</h4>
+                <div class="row" style="gap: 10px;">
+                    <div class="col"><button onclick="printReportWindow()" style="margin-bottom: 0;">🖨️ Print / Save Table as PDF</button></div>
+                    <div class="col"><button onclick="exportFilteredExcel()" style="margin-bottom: 0; background: var(--success-color); color:#0f172a;">📥 Download Filtered Excel (.xlsx)</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT ENGINE -->
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBleiQ6oSse-mF00_rd7keZGN93r_Eorwc",
+            authDomain: "mobil-otp-verification.firebaseapp.com",
+            databaseURL: "https://mobil-otp-verification-default-rtdb.firebaseio.com",
+            projectId: "mobil-otp-verification",
+            storageBucket: "mobil-otp-verification.firebasestorage.app",
+            messagingSenderId: "562891080486",
+            appId: "1:562891080486:web:11637af617058dd48437e7",
+            measurementId: "G-K5R8933EKR"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const rtdb = firebase.database();
+
+        let activeData = [];
+        let filteredData = [];
+        let activeFileName = "None";
+        let detectedCols = { veh: '', qty: '', date: '', unit: '', desc: '', bill: '' };
+
+        let mainSelectedBills = [];
+        let addonSelectedBills = [];
+        let addonSelectedTrips = [];
+
+        function updateClock() {
+            const now = new Date();
+            const opts = { timeZone: 'Asia/Kolkata', hour12: true, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('liveClock').innerText = '🕒 ' + now.toLocaleString('en-IN', opts) + ' IST';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function togglePillDropdown(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.streamlit-pill-box')) {
+                document.querySelectorAll('.pill-dropdown-content').forEach(d => d.classList.remove('show'));
+            }
+        }
+
+        function parseDescriptionWeight(descText, qty) {
+            const d = String(descText || '').toUpperCase();
+            const q = parseFloat(qty) || 0;
+            const matchKg = d.match(/\b(\d+(?:\.\d+)?)\s*KG\b/);
+            if (matchKg) return { wt: q * parseFloat(matchKg[1]), label: `EA (${matchKg[1]} Kg)` };
+            const matchGm = d.match(/\b(\d+(?:\.\d+)?)\s*(?:GM|GRAM)\b/);
+            if (matchGm) return { wt: q * (parseFloat(matchGm[1]) / 1000.0), label: `EA (${matchGm[1]} Gm)` };
+            const matchLtr = d.match(/\b(\d+(?:\.\d+)?)\s*(?:LTR|LITRE)\b/);
+            if (matchLtr) return { wt: q * parseFloat(matchLtr[1]), label: `EA (${matchLtr[1]} Ltr)` };
+            return { wt: 0, label: "EA" };
+        }
+
+        function saveColumnPreferences() {
+            const vehCol = document.getElementById('selVehCol').value;
+            const qtyCol = document.getElementById('selQtyCol').value;
+            const billCol = document.getElementById('selBillCol').value;
+            localStorage.setItem('plant2100_pref_veh', vehCol);
+            localStorage.setItem('plant2100_pref_qty', qtyCol);
+            localStorage.setItem('plant2100_pref_bill', billCol);
+            detectedCols.bill = billCol;
+        }
+
+        function sanitizeRowKeys(rows) {
+            return rows.map(row => {
+                let newRow = {};
+                Object.keys(row).forEach(key => {
+                    let cleanKey = key.replace(/[.#$ /\[\]]/g, "_");
+                    newRow[cleanKey] = row[key];
+                });
+                return newRow;
+            });
+        }
+
+        function cleanupAndRefreshVault() {
+            const vaultRef = rtdb.ref('vault_files');
+            vaultRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                const select = document.getElementById('vaultFilesList');
+                select.innerHTML = '';
+                if (!data) return;
+
+                const now = Date.now();
+                const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+
+                Object.keys(data).forEach(key => {
+                    const record = data[key];
+                    if (record.timestamp && (now - record.timestamp > twoDaysMs)) {
+                        rtdb.ref('vault_files/' + key).remove();
+                    } else {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.text = `[${key.slice(-4)}] ${record.fileName} (${record.uploadDate})`;
+                        select.appendChild(opt);
+                    }
+                });
+
+                if (select.options.length > 0 && activeData.length === 0) {
+                    loadLatestVaultFile();
+                }
+            });
+        }
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('fileUploader');
+            if (!fileInput.files.length) return alert("Kripya ek Excel/CSV file chunein.");
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames.includes('Sheet1') ? 'Sheet1' : workbook.SheetNames[0];
+                    let jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+
+                    let cleanData = cleanAndFilterPlant2100(jsonRows);
+                    cleanData = sanitizeRowKeys(cleanData);
+
+                    const saveMode = document.getElementById('saveMode').value;
+
+                    if (saveMode.includes("append") && activeData.length > 0) {
+                        cleanData = [...activeData, ...cleanData];
+                        activeFileName = "Merged_" + file.name;
+                    } else {
+                        activeFileName = file.name;
+                    }
+
+                    const uploadTimestamp = new Date().toLocaleString('en-IN');
+                    const fileRecord = {
+                        fileName: activeFileName,
+                        uploadDate: uploadTimestamp,
+                        timestamp: Date.now(),
+                        data: cleanData
+                    };
+
+                    const newRef = rtdb.ref('vault_files').push();
+                    newRef.set(fileRecord).then(() => {
+                        cleanupAndRefreshVault();
+                        setActiveDataset(cleanData, activeFileName);
+                        alert("✅ File saved to Cloud Vault & Synced Successfully!");
+                    }).catch(err => {
+                        alert("❌ Cloud save failed: " + err.message);
+                    });
+                } catch(ex) {
+                    alert("❌ File parsing error: " + ex.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function cleanAndFilterPlant2100(rows) {
+            if (!rows.length) return [];
+            let plantCol = Object.keys(rows[0]).find(k => k.trim().toLowerCase().includes("plant"));
+            if (plantCol) {
+                return rows.filter(r => String(r[plantCol]).includes("2100"));
+            }
+            return rows;
+        }
+
+        function loadVaultFile() {
+            const val = document.getElementById('vaultFilesList').value;
+            if (!val) return;
+            rtdb.ref('vault_files/' + val).once('value', (snapshot) => {
+                const rec = snapshot.val();
+                if (rec) setActiveDataset(rec.data, rec.fileName);
+            });
+        }
+
+        function loadLatestVaultFile() {
+            rtdb.ref('vault_files').limitToLast(1).once('value', (snapshot) => {
+                const val = snapshot.val();
+                if (val) {
+                    const key = Object.keys(val)[0];
+                    setActiveDataset(val[key].data, val[key].fileName);
+                }
+            });
+        }
+
+        function deleteVaultFile() {
+            const val = document.getElementById('vaultFilesList').value;
+            if (!val) return;
+            rtdb.ref('vault_files/' + val).remove().then(() => {
+                cleanupAndRefreshVault();
+                setActiveDataset([], "None");
+                alert("🗑️ File deleted from Cloud Vault!");
+            });
+        }
+
+        rtdb.ref('vault_files').on('value', () => {
+            cleanupAndRefreshVault();
+        });
+
+        function setActiveDataset(data, fileName) {
+            activeData = data;
+            filteredData = data;
+            activeFileName = fileName;
+            document.getElementById('activeFileName').innerText = fileName;
+
+            if (data.length > 0) {
+                const cols = Object.keys(data[0]);
+                autoDetectColumns(cols);
+                populateDropdowns(cols);
+                extractBillingDates();
+                filterAndRenderData();
+                addonInitVehicles();
+            }
+        }
+
+        function autoDetectColumns(cols) {
+            detectedCols = { veh: '', qty: '', date: '', unit: '', desc: '', bill: '' };
+
+            const savedBill = localStorage.getItem('plant2100_pref_bill');
+            if (savedBill && cols.includes(savedBill)) {
+                detectedCols.bill = savedBill;
+            }
+
+            cols.forEach(c => {
+                const cl = c.toLowerCase();
+                if (!detectedCols.veh && (cl.includes("vehicle") || cl.includes("truck") || cl.includes("veh"))) detectedCols.veh = c;
+                if (!detectedCols.qty && (cl.includes("quantity") || cl.includes("qty") || cl.includes("invoiced"))) detectedCols.qty = c;
+                if (!detectedCols.date && cl.includes("billing date")) detectedCols.date = c;
+                if (!detectedCols.unit && (cl.includes("unit") || cl.includes("uom"))) detectedCols.unit = c;
+                if (!detectedCols.desc && (cl.includes("description") || cl.includes("text") || cl.includes("desc"))) detectedCols.desc = c;
+                
+                // STRICT BILLING DOCUMENT DETECTION (Excludes Item / Line / Doc. Item)
+                if (!detectedCols.bill && !savedBill && cl.includes("billing document") && !cl.includes("item") && !cl.includes("line")) {
+                    detectedCols.bill = c;
+                }
+            });
+
+            if (!detectedCols.bill && !savedBill) {
+                detectedCols.bill = cols.find(c => {
+                    const cl = c.toLowerCase();
+                    return cl.includes("document") && !cl.includes("item") && !cl.includes("line");
+                }) || cols[0];
+            }
+            if (!detectedCols.date) detectedCols.date = cols.find(c => c.toLowerCase().includes("date")) || '';
+        }
+
+        function populateDropdowns(cols) {
+            const vehSel = document.getElementById('selVehCol');
+            const qtySel = document.getElementById('selQtyCol');
+            const billSel = document.getElementById('selBillCol');
+            vehSel.innerHTML = ''; qtySel.innerHTML = ''; billSel.innerHTML = '';
+
+            const savedVeh = localStorage.getItem('plant2100_pref_veh');
+            const savedQty = localStorage.getItem('plant2100_pref_qty');
+            const savedBill = localStorage.getItem('plant2100_pref_bill');
+
+            cols.forEach(c => {
+                let vehMatch = savedVeh ? (c === savedVeh) : (c === detectedCols.veh);
+                let qtyMatch = savedQty ? (c === savedQty) : (c === detectedCols.qty);
+                let billMatch = savedBill ? (c === savedBill) : (c === detectedCols.bill);
+
+                vehSel.add(new Option(c, c, false, vehMatch));
+                qtySel.add(new Option(c, c, false, qtyMatch));
+                billSel.add(new Option(c, c, false, billMatch));
+            });
+            saveColumnPreferences();
+            processVehicleOptions();
+        }
+
+        function extractBillingDates() {
+            if (!detectedCols.date || !activeData.length) {
+                document.getElementById('activeFileDates').innerText = "N/A";
+                return;
+            }
+            const dates = [...new Set(activeData.map(r => String(r[detectedCols.date]).split(' ')[0]))].filter(d => d && d !== '#');
+            document.getElementById('activeFileDates').innerText = dates.join(', ') || "N/A";
+        }
+
+        function filterAndRenderData() {
+            const term = document.getElementById('globalSearch').value.toLowerCase().trim();
+            if (term) {
+                filteredData = activeData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(term)));
+            } else {
+                filteredData = activeData;
+            }
+            processVehicleOptions();
+        }
+
+        function processVehicleOptions() {
+            const vehCol = document.getElementById('selVehCol').value;
+            if (!vehCol || !filteredData.length) return;
+
+            let vehicles = [...new Set(filteredData.map(r => String(r[vehCol]).trim()))]
+                            .filter(v => v && v !== '#' && !v.toLowerCase().includes("total")).sort();
+
+            window.allVehiclesCache = vehicles;
+            filterVehiclesList();
+        }
+
+        function filterVehiclesList() {
+            const q = document.getElementById('vehSearch').value.toLowerCase().trim();
+            const vehSel = document.getElementById('selVehicle');
+            vehSel.innerHTML = '';
+            
+            let matches = window.allVehiclesCache || [];
+            if (q) matches = matches.filter(v => v.toLowerCase().includes(q) || v.toLowerCase().endsWith(q));
+
+            matches.forEach(v => vehSel.add(new Option(v, v)));
+            processTripSequences();
+        }
+
+        function processTripSequences() {
+            const veh = document.getElementById('selVehicle').value;
+            const vehCol = document.getElementById('selVehCol').value;
+            const billCol = document.getElementById('selBillCol').value;
+            const dateSel = document.getElementById('selDate');
+            
+            if (!veh) return;
+            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
+
+            if (detectedCols.date) {
+                const dates = ["All Dates", ...new Set(rows.map(r => String(r[detectedCols.date])))].filter(d => d);
+                dateSel.innerHTML = '';
+                dates.forEach(d => dateSel.add(new Option(d, d)));
+            }
+
+            const chosenDate = dateSel.value;
+            if (chosenDate && chosenDate !== "All Dates" && detectedCols.date) {
+                rows = rows.filter(r => String(r[detectedCols.date]) === chosenDate);
+            }
+
+            if (billCol) {
+                let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
+                
+                let numBills = bills.map(b => {
+                    let nums = b.match(/\d+/g);
+                    return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
+                }).sort((a,b) => a.num - b.num);
+
+                let trips = [], curTrip = [], prevNum = null;
+                numBills.forEach(item => {
+                    if (prevNum === null || (item.num - prevNum <= 3)) {
+                        curTrip.push(item.orig);
+                    } else {
+                        trips.push(curTrip);
+                        curTrip = [item.orig];
+                    }
+                    prevNum = item.num > 0 ? item.num : prevNum;
+                });
+                if (curTrip.length) trips.push(curTrip);
+
+                window.currentTripsMap = trips;
+                renderMainTripRadioGroup(trips, bills);
+            }
+        }
+
+        function renderMainTripRadioGroup(trips, allBills) {
+            const area = document.getElementById('tripSelectionArea');
+            const group = document.getElementById('tripRadioGroup');
+            group.innerHTML = '';
+            area.style.display = 'block';
+
+            trips.forEach((grp, idx) => {
+                let label = `Trip ${idx+1} (${grp[0]} to ${grp[grp.length-1]})`;
+                group.innerHTML += `<label><input type="radio" name="mainTripMode" value="${idx}" ${idx===0?'checked':''} onchange="syncMainBills()"> ${label}</label>`;
+            });
+            group.innerHTML += `<label><input type="radio" name="mainTripMode" value="custom" onchange="syncMainBills()"> Custom Sequence</label>`;
+
+            window.mainAllBills = allBills;
+            if(trips.length > 0) mainSelectedBills = [...trips[0]];
+            renderMainPills();
+            calculateSelectedTrip();
+        }
+
+        function syncMainBills() {
+            const mode = document.querySelector('input[name="mainTripMode"]:checked')?.value;
+            const trips = window.currentTripsMap || [];
+            if(mode !== undefined && mode !== 'custom' && trips[mode]) {
+                mainSelectedBills = [...trips[mode]];
+            }
+            renderMainPills();
+            calculateSelectedTrip();
+        }
+
+        function renderMainPills() {
+            const box = document.getElementById('mainBillPillBox');
+            let html = '';
+            mainSelectedBills.forEach(b => {
+                html += `<div class="streamlit-pill">${b} <span onclick="removeMainBill('${b}', event)">×</span></div>`;
+            });
+            if(mainSelectedBills.length === 0) {
+                html += `<span style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>`;
+            }
+            box.innerHTML = html + `<div class="pill-dropdown-content" id="mainBillDropdown"></div>`;
+
+            const dropEl = document.getElementById('mainBillDropdown');
+            (window.mainAllBills || []).forEach(b => {
+                let isSel = mainSelectedBills.includes(b);
+                dropEl.innerHTML += `<div class="pill-option" onclick="toggleMainBill('${b}', event)" style="${isSel ? 'background:rgba(56,189,248,0.15); color:#38bdf8;' : ''}">${b} ${isSel ? '✓' : ''}</div>`;
+            });
+        }
+
+        function toggleMainBill(b, e) {
+            e.stopPropagation();
+            if(mainSelectedBills.includes(b)) {
+                mainSelectedBills = mainSelectedBills.filter(item => item !== b);
+            } else {
+                mainSelectedBills.push(b);
+            }
+            renderMainPills();
+            calculateSelectedTrip();
+        }
+
+        function removeMainBill(b, e) {
+            e.stopPropagation();
+            mainSelectedBills = mainSelectedBills.filter(item => item !== b);
+            renderMainPills();
+            calculateSelectedTrip();
+        }
+
+        function calculateSelectedTrip() {
+            const veh = document.getElementById('selVehicle').value;
+            const vehCol = document.getElementById('selVehCol').value;
+            const qtyCol = document.getElementById('selQtyCol').value;
+            const billCol = document.getElementById('selBillCol').value;
+            const scope = document.getElementById('calcModeScope').value;
+
+            if (!veh || !vehCol || !qtyCol) return;
+
+            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
+            if (mainSelectedBills.length && billCol) {
+                rows = rows.filter(r => mainSelectedBills.includes(String(r[billCol])));
+            }
+
+            let bag50 = 0, bag25 = 0, eaQty = 0, eaWeight = 0;
+            rows.forEach(r => {
+                let q = parseFloat(r[qtyCol]) || 0;
+                let u = String(r[detectedCols.unit] || 'BAG').toUpperCase();
+                let d = String(r[detectedCols.desc] || '').toUpperCase();
+
+                if (scope === 'bags' && u.includes('EA')) return;
+                if (scope === 'ea' && !u.includes('EA')) return;
+
+                if (u.includes('EA')) {
+                    eaQty += q;
+                    let parsed = parseDescriptionWeight(d, q);
+                    eaWeight += parsed.wt;
+                } else {
+                    if (d.includes('25')) { bag25 += q; } 
+                    else { bag50 += q; }
+                }
+            });
+
+            let totBags = bag50 + bag25;
+            let bagWtOpt1 = (bag50 * 50.120) + (bag25 * 25.120);
+            let bagWtOpt2 = (bag50 * 50.0) + (bag25 * 25.0);
+            let totalOpt1 = bagWtOpt1 + eaWeight;
+            let totalOpt2 = bagWtOpt2 + eaWeight;
+
+            document.getElementById('m50Bag').innerText = bag50.toLocaleString() + " Bags";
+            document.getElementById('m25Bag').innerText = bag25.toLocaleString() + " Bags";
+            document.getElementById('mTotBag').innerText = totBags.toLocaleString() + " Bags";
+            document.getElementById('mEAQty').innerText = eaQty.toLocaleString();
+            document.getElementById('mOpt1MT').innerText = (totalOpt1 / 1000.0).toFixed(3) + " MT";
+            document.getElementById('mOpt1Kg').innerText = `↑ ${totalOpt1.toFixed(2)} Kgs`;
+            document.getElementById('mOpt2MT').innerText = (totalOpt2 / 1000.0).toFixed(3) + " MT";
+            document.getElementById('mOpt2Kg').innerText = `↑ ${totalOpt2.toFixed(2)} Kgs`;
+            document.getElementById('mEAMT').innerText = (eaWeight / 1000.0).toFixed(3) + " MT";
+            document.getElementById('mEAKg').innerText = `↑ ${eaWeight.toFixed(2)} Kgs`;
+        }
+
+        // =====================================================================
+        // TRIPLE-MODE ADD-ON MODULE LOGIC
+        // =====================================================================
+        function addonInitVehicles() {
+            if (!filteredData.length) return;
+            const vehCol = detectedCols.veh || Object.keys(filteredData[0])[0];
+            let vehicles = [...new Set(filteredData.map(r => String(r[vehCol]).trim()))].filter(v => v && v !== '#').sort();
+            window.addonVehCache = vehicles;
+            addonFilterVehicles();
+        }
+
+        function addonFilterVehicles() {
+            const q = document.getElementById('addonVehSearch').value.toLowerCase().trim();
+            const sel = document.getElementById('addonSelVehicle');
+            sel.innerHTML = '';
+            let matches = window.addonVehCache || [];
+            if (q) matches = matches.filter(v => v.toLowerCase().includes(q) || v.toLowerCase().endsWith(q));
+            matches.forEach(v => sel.add(new Option(v, v)));
+            addonProcessTrips();
+        }
+
+        function addonProcessTrips() {
+            const veh = document.getElementById('addonSelVehicle').value;
+            const vehCol = detectedCols.veh;
+            const billCol = document.getElementById('selBillCol').value;
+            if (!veh || !vehCol || !billCol) return;
+
+            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
+            let bills = [...new Set(rows.map(r => String(r[billCol])))].filter(b => b && b !== 'undefined');
+
+            let numBills = bills.map(b => {
+                let nums = b.match(/\d+/g);
+                return { orig: b, num: nums ? parseInt(nums[nums.length - 1]) : 0 };
+            }).sort((a,b) => a.num - b.num);
+
+            let trips = [], curTrip = [], prevNum = null;
+            numBills.forEach(item => {
+                if (prevNum === null || (item.num - prevNum <= 3)) {
+                    curTrip.push(item.orig);
+                } else {
+                    trips.push(curTrip);
+                    curTrip = [item.orig];
+                }
+                prevNum = item.num > 0 ? item.num : prevNum;
+            });
+            if (curTrip.length) trips.push(curTrip);
+
+            window.addonTripsMap = trips;
+            window.addonAllBills = bills;
+
+            let bannerText = trips.map((grp, idx) => `Trip ${idx+1}: ${grp[0]} to ${grp[grp.length-1]}`).join(" | ");
+            document.getElementById('addonAutoDetectedBanner').innerHTML = `🔍 Auto-Detected Trips: ${bannerText}`;
+
+            addonRenderSelectionUI();
+        }
+
+        function addonRenderSelectionUI() {
+            const style = document.querySelector('input[name="addonStyle"]:checked').value;
+            const container = document.getElementById('addonDynamicUI');
+            container.innerHTML = '';
+            const trips = window.addonTripsMap || [];
+
+            if (style === 'radio') {
+                container.innerHTML = `<label>👉 Select an individual trip:</label><div class="radio-group">`;
+                trips.forEach((grp, idx) => {
+                    container.innerHTML += `<label><input type="radio" name="addonTripRad" value="${idx}" ${idx===0?'checked':''} onchange="addonSyncBills()"> Trip ${idx+1} (${grp[0]} to ${grp[grp.length-1]})</label>`;
+                });
+                container.innerHTML += `</div>`;
+            } else if (style === 'checkbox') {
+                container.innerHTML = `<label>👉 Tick multiple trips to combine them instantly:</label><div class="checkbox-group">`;
+                trips.forEach((grp, idx) => {
+                    container.innerHTML += `<label><input type="checkbox" name="addonTripChk" value="${idx}" ${idx===0?'checked':''} onchange="addonSyncBills()"> Trip ${idx+1} (${grp.length} bills)</label>`;
+                });
+                container.innerHTML += `</div>`;
+            } else {
+                container.innerHTML = `<label>👉 Select one or multiple trips from Dropdown:</label><div class="streamlit-pill-box" id="addonTripPillBox" onclick="togglePillDropdown('addonTripDropdown')"><span style="color:var(--subtext-color); font-size:12px;">Select trips...</span><div class="pill-dropdown-content" id="addonTripDropdown"></div></div>`;
+                
+                addonSelectedTrips = trips.map((_, idx) => idx);
+                renderAddonTripPills();
+            }
+            addonSyncBills();
+        }
+
+        function renderAddonTripPills() {
+            const box = document.getElementById('addonTripPillBox');
+            if(!box) return;
+            const trips = window.addonTripsMap || [];
+            
+            let html = '';
+            addonSelectedTrips.forEach(idx => {
+                if(trips[idx]) {
+                    html += `<div class="streamlit-pill">Trip ${idx+1} <span onclick="removeAddonTrip(${idx}, event)">×</span></div>`;
+                }
+            });
+            if(addonSelectedTrips.length === 0) {
+                html += `<span style="color: var(--subtext-color); font-size: 12px;">Select trips...</span>`;
+            }
+            box.innerHTML = html + `<div class="pill-dropdown-content" id="addonTripDropdown"></div>`;
+
+            const dropEl = document.getElementById('addonTripDropdown');
+            trips.forEach((grp, idx) => {
+                let isSel = addonSelectedTrips.includes(idx);
+                dropEl.innerHTML += `<div class="pill-option" onclick="toggleAddonTrip(${idx}, event)" style="${isSel ? 'background:rgba(56,189,248,0.15); color:#38bdf8;' : ''}">Trip ${idx+1} (${grp[0]} to ${grp[grp.length-1]}) ${isSel ? '✓' : ''}</div>`;
+            });
+        }
+
+        function toggleAddonTrip(idx, e) {
+            e.stopPropagation();
+            if(addonSelectedTrips.includes(idx)) {
+                addonSelectedTrips = addonSelectedTrips.filter(i => i !== idx);
+            } else {
+                addonSelectedTrips.push(idx);
+            }
+            renderAddonTripPills();
+            addonSyncBills();
+        }
+
+        function removeAddonTrip(idx, e) {
+            e.stopPropagation();
+            addonSelectedTrips = addonSelectedTrips.filter(i => i !== idx);
+            renderAddonTripPills();
+            addonSyncBills();
+        }
+
+        function addonSyncBills() {
+            const style = document.querySelector('input[name="addonStyle"]:checked').value;
+            const trips = window.addonTripsMap || [];
+            let targetBills = [];
+
+            if (style === 'radio') {
+                const checked = document.querySelector('input[name="addonTripRad"]:checked');
+                if (checked && trips[checked.value]) targetBills = trips[checked.value];
+            } else if (style === 'checkbox') {
+                const checkedBoxes = document.querySelectorAll('input[name="addonTripChk"]:checked');
+                checkedBoxes.forEach(chk => {
+                    if (trips[chk.value]) targetBills.push(...trips[chk.value]);
+                });
+            } else {
+                addonSelectedTrips.forEach(idx => {
+                    if (trips[idx]) targetBills.push(...trips[idx]);
+                });
+            }
+
+            addonSelectedBills = [...targetBills];
+            renderAddonBillPills();
+            addonCalculate();
+        }
+
+        function renderAddonBillPills() {
+            const box = document.getElementById('addonBillPillBox');
+            let html = '';
+            addonSelectedBills.forEach(b => {
+                html += `<div class="streamlit-pill">${b} <span onclick="removeAddonBill('${b}', event)">×</span></div>`;
+            });
+            if(addonSelectedBills.length === 0) {
+                html += `<span style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>`;
+            }
+            box.innerHTML = html + `<div class="pill-dropdown-content" id="addonBillDropdown"></div>`;
+
+            const dropEl = document.getElementById('addonBillDropdown');
+            (window.addonAllBills || []).forEach(b => {
+                let isSel = addonSelectedBills.includes(b);
+                dropEl.innerHTML += `<div class="pill-option" onclick="toggleAddonBill('${b}', event)" style="${isSel ? 'background:rgba(56,189,248,0.15); color:#38bdf8;' : ''}">${b} ${isSel ? '✓' : ''}</div>`;
+            });
+        }
+
+        function toggleAddonBill(b, e) {
+            e.stopPropagation();
+            if(addonSelectedBills.includes(b)) {
+                addonSelectedBills = addonSelectedBills.filter(item => item !== b);
+            } else {
+                addonSelectedBills.push(b);
+            }
+            renderAddonBillPills();
+            addonCalculate();
+        }
+
+        function removeAddonBill(b, e) {
+            e.stopPropagation();
+            addonSelectedBills = addonSelectedBills.filter(item => item !== b);
+            renderAddonBillPills();
+            addonCalculate();
+        }
+
+        function addonCalculate() {
+            const veh = document.getElementById('addonSelVehicle').value;
+            const vehCol = detectedCols.veh;
+            const qtyCol = detectedCols.qty;
+            const billCol = document.getElementById('selBillCol').value;
+
+            if (!veh || !filteredData.length) return;
+
+            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
+            if (addonSelectedBills.length && billCol) {
+                rows = rows.filter(r => addonSelectedBills.includes(String(r[billCol])));
+            }
+
+            let s50 = 0, s25 = 0, eaQty = 0, eaWt = 0;
+            rows.forEach(r => {
+                let q = parseFloat(r[qtyCol]) || 0;
+                let d = String(r[detectedCols.desc] || '').toUpperCase();
+                let u = String(r[detectedCols.unit] || '').toUpperCase();
+                if (u.includes('EA')) {
+                    eaQty += q;
+                    let parsed = parseDescriptionWeight(d, q);
+                    eaWt += parsed.wt;
+                } else if (d.includes('25')) {
+                    s25 += q;
+                } else {
+                    s50 += q;
+                }
+            });
+
+            let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
+            let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
+            let opt1Total = bagsWt1 + eaWt;
+            let opt2Total = bagsWt2 + eaWt;
+
+            document.getElementById('addonLiveTotalsTitle').innerText = `📈 Live Totals for ${veh} (Selection Active)`;
+            document.getElementById('addonM50').innerText = s50.toLocaleString() + " Bags";
+            document.getElementById('addonM25').innerText = s25.toLocaleString() + " Bags";
+            document.getElementById('addonMTot').innerText = (s50 + s25).toLocaleString() + " Bags";
+            document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
+            document.getElementById('addonOpt1MT').innerText = (opt1Total / 1000.0).toFixed(3) + " MT";
+            document.getElementById('addonOpt1Kg').innerText = `↑ ${opt1Total.toFixed(2)} Kgs`;
+            document.getElementById('addonOpt2MT').innerText = (opt2Total / 1000.0).toFixed(3) + " MT";
+            document.getElementById('addonOpt2Kg').innerText = `↑ ${opt2Total.toFixed(2)} Kgs`;
+            document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
+            document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
+        }
+
+        function printReportWindow() { window.print(); }
+        function exportFilteredExcel() {
+            if (!filteredData.length) return alert("Export karne ke liye data nahi hai.");
+            const ws = XLSX.utils.json_to_sheet(filteredData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Tonnage Report");
+            XLSX.writeFile(wb, `Tonnage_Report_Plant2100_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+    </script>
+</body>
+</html>
+<!-- WhatsApp Share Component Card -->
+<div class="card" style="border-color: #25d366; background: #0f172a;">
+    <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
+    <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
+        1 click me 50kg, 25kg, EA unit, total bags aur exact bill numbers ke sath WhatsApp alert bhechein.
+    </p>
+    <div class="row">
+        <div class="col">
+            <input type="text" id="waMobileNumber" placeholder="Enter Mobile No. (e.g., 919876543210)" style="margin-bottom: 8px;">
+        </div>
+        <div class="col">
+            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0;">
+                🚀 Send WhatsApp Message
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function sendWhatsAppDispatch() {
+    const mobile = document.getElementById('waMobileNumber').value.trim();
+    
+    // Vehicle check
+    let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
+    
+    if (!veh) {
+        alert("Kripya pehle vehicle select karein.");
+        return;
+    }
+
+    // Total bags check
+    let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
+    let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
+    let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
+    let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
+
+    // --- BULLETPROOF BILL NUMBER EXTRACTION ---
+    let activeBills = [];
+
+    // 1. Pehle dekhenge ki Addon pill box me kaunse bills active hain
+    const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
+    addonPills.forEach(pill => {
+        let text = pill.textContent.replace('×', '').trim();
+        if (text) activeBills.push(text);
+    });
+
+    // 2. Agar addon me nahi mile, toh Main pill box ke bills check karenge
+    if (activeBills.length === 0) {
+        const mainPills = document.querySelectorAll('#mainBillPillBox .streamlit-pill');
+        mainPills.forEach(pill => {
+            let text = pill.textContent.replace('×', '').trim();
+            if (text) activeBills.push(text);
+        });
+    }
+
+    // 3. Agar fir bhi na mile, toh global selected arrays check karenge
+    if (activeBills.length === 0) {
+        if (window.addonSelectedBills && window.addonSelectedBills.length > 0) {
+            activeBills = window.addonSelectedBills;
+        } else if (window.mainSelectedBills && window.mainSelectedBills.length > 0) {
+            activeBills = window.mainSelectedBills;
+        }
+    }
+
+    const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
+
+    // Clean Message Format
+    let message = "🚨 VEHICLE DISPATCH CLEARANCE 🚛\n\n" +
+                  "🔹 Vehicle No: " + veh + "\n" +
+                  "📌 Status: ✅ Approved for Dispatch\n" +
+                  "📦 50 Kg Bags: " + bag50 + "\n" +
+                  "📦 25 Kg Bags: " + bag25 + "\n" +
+                  "📦 EA Unit (Loose): " + eaQty + "\n" +
+                  "📊 Total Bags: " + totalBags + "\n" +
+                  "🧾 Bill Numbers: " + billsText;
+
+// Direct App Scheme URL (No confirmation page, opens app instantly)
+    let url = "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message);
+    
+    // Direct trigger without opening new tab
+    window.location.href = url;
+}
+</script>
+
