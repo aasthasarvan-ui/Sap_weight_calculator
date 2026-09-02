@@ -1155,7 +1155,9 @@
     let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
 
     // Clean, formatted message with PNPL SCM MOGA & Signature
-    let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
+if (formatType === 'table') {
+        // 📊 1. Monospace Table Format (Bags Total Weight only)
+    message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
                   "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
                   "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
                   currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
@@ -1172,7 +1174,29 @@
                   humanSign + "\n" +
                   "──➦ [ PNPL SCM MOGA Hub ]\n" +
                   "━━━━━━━━━━━━━━━━━━━━━━";
-
+  } else {
+        // ✨ 2. Classic Emoji & Rich Text Format (Separate Slips)
+message = "```━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  "          🏭 PNPL SCM MOGA           \n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  " VEHICLE NO : " + veh + "\n" +
+                  " STATUS     : APPROVED FOR DISPATCH \n" +
+                  " DATE       : " + currentDate + " (" + currentTime + ")\n" +
+                  "------------------------------------\n" +
+                  " CATEGORY    | QTY      | PRECISION WT\n" +
+                  "------------------------------------\n" +
+                  " 50 Kg Bags  | " + String(bag50).padEnd(8) + " | " + bOpt1.toFixed(3) + " MT\n" +
+                  " 25 Kg Bags  | " + String(bag25).padEnd(8) + " | " + bOpt2.toFixed(3) + " MT\n" +
+                  " EA (Loose)  | " + String(eaQty).padEnd(8) + " | " + eWt.toFixed(3) + " MT\n" +
+                  "------------------------------------\n" +
+                  " TOTAL BAGS  : " + totalBags + "\n" +
+                  " TOTAL WT    : " + bOpt1.toFixed(3) + " MT\n" +
+                  "------------------------------------\n" +
+                  " BILLS: " + billsText + "\n" +
+                  "------------------------------------\n" +
+                  " Auth Sign: " + humanSign + "\n" +
+                  " [ PNPL SCM MOGA Hub ]\n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━```";
     // Direct App Scheme URL (Exact working method)
     let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
     
