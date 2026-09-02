@@ -983,9 +983,11 @@
         function addonCalculate() {
     const veh = document.getElementById('addonSelVehicle').value;
     const vehCol = detectedCols.veh;
-    const qtyCol = detectedCols.qty;
+    const qtyCol = document.getElementById('selQtyCol').value;
     const billCol = document.getElementById('selBillCol').value;
-    const scope = document.getElementById('calcModeScope').value; // 👈 1. Yeh line add karni hai
+    
+    // 🔹 Category Scope (Main calculator wala dropdown ya Add-on dropdown)
+    const scope = document.getElementById('addonCalcModeScope')?.value || document.getElementById('calcModeScope')?.value || 'all';
 
     if (!veh || !filteredData.length) return;
 
@@ -1000,7 +1002,7 @@
         let d = String(r[detectedCols.desc] || '').toUpperCase();
         let u = String(r[detectedCols.unit] || '').toUpperCase();
 
-        // 👈 2. Yeh do lines filter logic ke liye add karni hain
+        // 🔹 Category Scope Filtering Logic (Only BAGS / Only EA / All)
         if (scope === 'bags' && u.includes('EA')) return;
         if (scope === 'ea' && !u.includes('EA')) return;
 
@@ -1015,14 +1017,24 @@
         }
     });
 
+    let totBags = s50 + s25;
+
+    // 🔹 Separate Calculations for Bags (Opt 1 & Opt 2)
     let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
     let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
+
+    // Global variables me save karein taaki WhatsApp message me exact do alag slips ki tarah jaye
+    window.lastCalcBagsOpt1 = bagsWt1;
+    window.lastCalcBagsOpt2 = bagsWt2;
+    window.lastCalcEaWt = eaWt;
 
     document.getElementById('addonLiveTotalsTitle').innerText = `📈 Live Totals for ${veh} (Selection Active)`;
     document.getElementById('addonM50').innerText = s50.toLocaleString() + " Bags";
     document.getElementById('addonM25').innerText = s25.toLocaleString() + " Bags";
-    document.getElementById('addonMTot').innerText = (s50 + s25).toLocaleString() + " Bags";
+    document.getElementById('addonMTot').innerText = totBags.toLocaleString() + " Bags";
     document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
+    
+    // UI Display matching exact screenshots format
     document.getElementById('addonOpt1MT').innerText = (bagsWt1 / 1000.0).toFixed(3) + " MT";
     document.getElementById('addonOpt1Kg').innerText = `↑ ${bagsWt1.toFixed(2)} Kgs`;
     document.getElementById('addonOpt2MT').innerText = (bagsWt2 / 1000.0).toFixed(3) + " MT";
@@ -1030,7 +1042,6 @@
     document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
     document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
 }
-
         function printReportWindow() { window.print(); }
         function exportFilteredExcel() {
             if (!filteredData.length) return alert("Export karne ke liye data nahi hai.");
