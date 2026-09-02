@@ -1096,24 +1096,25 @@
 </div>
 
 <script>
-   function sendWhatsAppDispatch() {
+  function sendWhatsAppDispatch() {
     const mobile = document.getElementById('waMobileNumber').value.trim();
-
-    // Vehicle check
+    const formatType = document.querySelector('input[name="waMsgFormat"]:checked')?.value || 'table';
+    
     let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
-
     if (!veh) {
         alert("Kripya pehle vehicle select karein.");
         return;
     }
 
-    // Total bags check
     let bag50 = document.getElementById('addonM50')?.innerText || document.getElementById('m50Bag')?.innerText || "0 Bags";
     let bag25 = document.getElementById('addonM25')?.innerText || document.getElementById('m25Bag')?.innerText || "0 Bags";
     let eaQty = document.getElementById('addonMEA')?.innerText || document.getElementById('mEAQty')?.innerText || "0";
     let totalBags = document.getElementById('addonMTot')?.innerText || document.getElementById('mTotBag')?.innerText || "0 Bags";
 
-    // Bill Numbers extraction
+    let bOpt1 = (window.lastCalcBagsOpt1 || 0) / 1000.0;
+    let bOpt2 = (window.lastCalcBagsOpt2 || 0) / 1000.0;
+    let eWt = (window.lastCalcEaWt || 0) / 1000.0;
+
     let activeBills = [];
     const addonPills = document.querySelectorAll('#addonBillPillBox .streamlit-pill');
     addonPills.forEach(pill => {
@@ -1140,8 +1141,8 @@
     const billsText = (activeBills.length > 0) ? [...new Set(activeBills)].join(', ') : 'N/A';
     const currentDate = new Date().toLocaleDateString('en-IN');
     const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
 
-    // Dynamic vehicle theme
     let charSum = 0;
     for (let i = 0; i < veh.length; i++) {
         charSum += veh.charCodeAt(i);
@@ -1152,19 +1153,52 @@
         { title: "SECURE TRANSIT", emoji: "🛡️" }
     ];
     let currentTheme = themes[charSum % themes.length];
-    let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
 
-    // Clean, formatted message with PNPL SCM MOGA & Signature
-    let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
+    let message = "";
+
+    if (formatType === 'table') {
+        // 📊 1. Monospace Table Format (Bags Total Weight only)
+        message = "```━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  "          🏭 PNPL SCM MOGA           \n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                  " VEHICLE NO : " + veh + "\n" +
+                  " STATUS     : APPROVED FOR DISPATCH \n" +
+                  " DATE       : " + currentDate + " (" + currentTime + ")\n" +
+                  "------------------------------------\n" +
+                  " CATEGORY    | QTY      | PRECISION WT\n" +
+                  "------------------------------------\n" +
+                  " 50 Kg Bags  | " + String(bag50).padEnd(8) + " | " + bOpt1.toFixed(3) + " MT\n" +
+                  " 25 Kg Bags  | " + String(bag25).padEnd(8) + " | " + bOpt2.toFixed(3) + " MT\n" +
+                  " EA (Loose)  | " + String(eaQty).padEnd(8) + " | " + eWt.toFixed(3) + " MT\n" +
+                  "------------------------------------\n" +
+                  " TOTAL BAGS  : " + totalBags + "\n" +
+                  " TOTAL WT    : " + bOpt1.toFixed(3) + " MT\n" +
+                  "------------------------------------\n" +
+                  " BILLS: " + billsText + "\n" +
+                  "------------------------------------\n" +
+                  " Auth Sign: " + humanSign + "\n" +
+                  " [ PNPL SCM MOGA Hub ]\n" +
+                  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━```";
+    } else {
+        // ✨ 2. Classic Emoji & Rich Text Format (Separate Slips)
+        message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
                   "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
                   "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
                   currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
                   "🔹 Vehicle No: " + veh + "\n" +
                   "📌 Status: ✅ Approved for Dispatch\n\n" +
-                  "📦 50 Kg Bags: " + bag50 + "\n" +
-                  "📦 25 Kg Bags: " + bag25 + "\n" +
-                  "📦 EA Unit (Loose): " + eaQty + "\n" +
-                  "📊 Total Bags: " + totalBags + "\n" +
+                  
+                  "📦 *1st Slip: BAGS WEIGHMENT*\n" +
+                  "• 50 Kg Bags: " + bag50 + "\n" +
+                  "• 25 Kg Bags: " + bag25 + "\n" +
+                  "• Total Bags: " + totalBags + "\n" +
+                  "▫️ Precision Wt (Opt 1): " + bOpt1.toFixed(3) + " MT\n" +
+                  "▫️ Standard Slabs (Opt 2): " + bOpt2.toFixed(3) + " MT\n\n" +
+
+                  "📦 *2nd Slip: LOOSE / EA WEIGHMENT*\n" +
+                  "• EA Unit (Loose Qty): " + eaQty + "\n" +
+                  "▫️ EA Weight: " + eWt.toFixed(3) + " MT\n\n" +
+
                   "🧾 Bill Numbers: " + billsText + "\n\n" +
                   "📅 Date: " + currentDate + " | 🕒 Time: " + currentTime + "\n\n" +
                   "━━━━━━━━━━━━━━━━━━━━━━\n" +
@@ -1172,9 +1206,10 @@
                   humanSign + "\n" +
                   "──➦ [ PNPL SCM MOGA Hub ]\n" +
                   "━━━━━━━━━━━━━━━━━━━━━━";
+    }
 
-    // Direct App Scheme URL
     let url = mobile ? "whatsapp://send?phone=" + mobile + "&text=" + encodeURIComponent(message) : "whatsapp://send?text=" + encodeURIComponent(message);
     window.location.href = url;
 }
+
  </script>
