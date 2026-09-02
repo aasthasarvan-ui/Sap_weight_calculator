@@ -248,36 +248,44 @@
             </div>
 
             <!-- 2. TRIPLE-MODE ADVANCED ADD-ON MODULE -->
-            <div class="card">
-                <details open>
-                    <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
-                    <div style="margin-top: 12px;">
-                        <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
-                        <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
-                        
-                        <label>🚛 Select Vehicle:</label>
-                        <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
-                    </div>
+    <div class="card">
+        <details open>
+            <summary>🎛️ Advanced Multi-Trip Merge & Exact Sequence Engine (Click to Expand)</summary>
+            <div style="margin-top: 12px;">
+                <label>🔎 [Add-on] Quick Search Vehicle (Last 4 digits e.g. 0440, 2680):</label>
+                <input type="text" id="addonVehSearch" placeholder="e.g. 0440, 2680" oninput="addonFilterVehicles()">
+                
+                <label>🚛 Select Vehicle:</label>
+                <select id="addonSelVehicle" onchange="addonProcessTrips()"></select>
 
-                    <div class="trip-auto-banner" id="addonAutoDetectedBanner">
-                        🔍 Auto-Detected Trips: None
-                    </div>
+                <!-- 🔽 YAHAN CATEGORY SCOPE DROPDOWN ADD KIYA GAYA HAI 🔽 -->
+                <label style="margin-top: 10px;">🔍 [Add-on] Category Scope:</label>
+                <select id="addonCalcModeScope" onchange="addonCalculate()">
+                    <option value="all">All (Bags + EA Combined)</option>
+                    <option value="bags">Only BAGS</option>
+                    <option value="ea">Only EA (Loose Invoices)</option>
+                </select>
+                <!-- 🔼 ------------------------------------------------ 🔼 -->
+            </div>
 
-                    <label>Choose Selection Style:</label>
-                    <div class="radio-group" id="addonStyleGroup">
-                        <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
-                        <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
-                        <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
-                    </div>
+            <div class="trip-auto-banner" id="addonAutoDetectedBanner">
+                🔍 Auto-Detected Trips: None
+            </div>
 
-                    <div id="addonDynamicUI" style="margin-top: 12px;"></div>
+            <label>Choose Selection Style:</label>
+            <div class="radio-group" id="addonStyleGroup">
+                <label><input type="radio" name="addonStyle" value="radio" checked onchange="addonRenderSelectionUI()"> Radio (Individual Trip)</label>
+                <label><input type="radio" name="addonStyle" value="checkbox" onchange="addonRenderSelectionUI()"> Checkboxes (Multi-Trip Merge)</label>
+                <label><input type="radio" name="addonStyle" value="dropdown" onchange="addonRenderSelectionUI()"> Dropdown (Multi-Select)</label>
+            </div>
 
-                    <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
-                    <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
-                        <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
-                        <div class="pill-dropdown-content" id="addonBillDropdown"></div>
-                    </div>
+            <div id="addonDynamicUI" style="margin-top: 12px;"></div>
 
+            <label style="margin-top: 14px;">🧾 Select Exact Billing Sequence / Documents for this Trip:</label>
+            <div class="streamlit-pill-box" id="addonBillPillBox" onclick="togglePillDropdown('addonBillDropdown')">
+                <span id="addonBillPlaceholder" style="color: var(--subtext-color); font-size: 12px;">Select bills...</span>
+                <div class="pill-dropdown-content" id="addonBillDropdown"></div>
+            </div>
                     <!-- ADD-ON LIVE METRICS -->
                     <div id="addonMetricsOutput" style="margin-top: 15px; background: #0b0f19; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
                         <h4 id="addonLiveTotalsTitle" style="color: var(--accent-color); margin-bottom: 10px; font-size: 16px;">📈 Live Totals for Vehicle</h4>
