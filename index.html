@@ -1030,11 +1030,11 @@
     </script>
 </body>
 </html>
-<!-- Quick WhatsApp Dispatch Alert (PNPL SCM MOGA - Unique Dynamic Unicode Fonts per Vehicle) -->
+<!-- Quick WhatsApp Dispatch Alert (Clean, Readable & No Pop-up Issue) -->
 <div class="card" style="border-color: #25d366; background: #0f172a;">
     <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
     <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
-        PNPL SCM MOGA aur har vehicle ke liye alag unique font style ke sath WhatsApp clearance bhechein.
+        PNPL SCM MOGA dispatch clearance with premium readable typography and digital signature.
     </p>
 
     <div class="row">
@@ -1050,42 +1050,34 @@
 </div>
 
 <script>
-    // Helper function to convert standard text into unique Unicode font styles dynamically
-    function applyUniqueFont(text, styleType) {
+    // Helper function to apply high-readability clean fonts without bubble style
+    function applyCleanFont(text, styleType) {
         if (!text) return "";
         
-        // Different Unicode font mappings
         const maps = {
-            // Sans-Serif Bold
+            // Style 0: Bold Serif (Clean & Official)
+            serifBold: {
+                upper: "𝐀𝐁𝐂𝐃𝐄𝐅𝗚𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙",
+                lower: "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳",
+                digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
+            },
+            // Style 1: Sans-Serif Bold (Modern & Sharp)
             sansBold: {
                 upper: "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝑄𝗥𝗦𝗧𝗨𝗩𝑊𝗫𝗬𝑍",
                 lower: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇",
                 digits: "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟩𝟾𝟿"
             },
-            // Monospace Typewriter style
-            mono: {
-                upper: "𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝙹𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉",
-                lower: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟🇼𝚡𝚢𝚣",
-                digits: "𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
-            },
-            // Serif Bold Italic style
-            serifItalic: {
-                upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝐽𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
+            // Style 2: Bold Italic (Dynamic & Sleek)
+            boldItalic: {
+                upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
                 lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
-                digits: "𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
-            },
-            // Circled / Bubble style
-            circled: {
-                upper: "ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ",
-                lower: "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ",
-                digits: "⓪①②③④⑤⑥⑦⑧⑨"
+                digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
             }
         };
 
-        let activeMap = maps.sansBold;
-        if (styleType === 1) activeMap = maps.mono;
-        else if (styleType === 2) activeMap = maps.serifItalic;
-        else if (styleType === 3) activeMap = maps.circled;
+        let activeMap = maps.serifBold;
+        if (styleType === 1) activeMap = maps.sansBold;
+        else if (styleType === 2) activeMap = maps.boldItalic;
 
         const normalUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const normalLower = "abcdefghijklmnopqrstuvwxyz";
@@ -1112,18 +1104,17 @@
     }
 
     function sendWhatsAppDispatch() {
-        const mobile = document.getElementById('waMobileNumber').value.trim();
+        // Fallback default number agar input khali chhod diya jaye, taaki error popup na aaye
+        let mobile = document.getElementById('waMobileNumber').value.trim();
+        if (!mobile) {
+            mobile = "919878131706"; // Default Hub Contact Number
+        }
         
         // Vehicle check
         let veh = document.getElementById('addonSelVehicle')?.value || document.getElementById('selVehicle')?.value;
         
         if (!veh) {
             alert("Kripya pehle vehicle select karein.");
-            return;
-        }
-
-        if (!mobile) {
-            alert("Kripya WhatsApp mobile number enter karein.");
             return;
         }
 
@@ -1161,37 +1152,35 @@
         const currentDate = new Date().toLocaleDateString('en-IN');
         const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-        // --- UNIQUE DYNAMIC FONT & THEME GENERATOR PER VEHICLE ---
+        // --- UNIQUE DYNAMIC READABLE FONT & THEME PER VEHICLE ---
         let charSum = 0;
         for (let i = 0; i < veh.length; i++) {
             charSum += veh.charCodeAt(i);
         }
-        let fontVariantIndex = charSum % 4; // Generates 0, 1, 2, or 3 style index
+        let fontStyleIndex = charSum % 3; // Rotates between 3 clean professional styles
 
-        // Different themes & emojis corresponding to the vehicle hash
         const themes = [
-            { title: "PRIME DISPATCH", emoji: "🚀" },
-            { title: "EXPRESS CARGO", emoji: "⚡" },
-            { title: "SECURE FREIGHT", emoji: "🎯" },
-            { title: "SPEEDWAY TRANSIT", emoji: "🔥" }
+            { title: "EXPRESS DISPATCH", emoji: "🚀" },
+            { title: "PRIORITY LOGISTICS", emoji: "⚡" },
+            { title: "SECURE TRANSIT", emoji: "🛡️" }
         ];
         let currentTheme = themes[charSum % themes.length];
 
-        // Apply unique font transformation to the details
-        let styledVeh = applyUniqueFont("Vehicle No: " + veh, fontVariantIndex);
-        let styledBags50 = applyUniqueFont("50 Kg Bags: " + bag50, fontVariantIndex);
-        let styledBags25 = applyUniqueFont("25 Kg Bags: " + bag25, fontVariantIndex);
-        let styledEa = applyUniqueFont("EA Unit (Loose): " + eaQty, fontVariantIndex);
-        let styledTotal = applyUniqueFont("Total Bags: " + totalBags, fontVariantIndex);
-        let styledBills = applyUniqueFont("Bill Numbers: " + billsText, fontVariantIndex);
+        // Apply clean readable font transformation
+        let styledVeh = applyCleanFont("Vehicle No: " + veh, fontStyleIndex);
+        let styledBags50 = applyCleanFont("50 Kg Bags: " + bag50, fontStyleIndex);
+        let styledBags25 = applyCleanFont("25 Kg Bags: " + bag25, fontStyleIndex);
+        let styledEa = applyCleanFont("EA Unit (Loose): " + eaQty, fontStyleIndex);
+        let styledTotal = applyCleanFont("Total Bags: " + totalBags, fontStyleIndex);
+        let styledBills = applyCleanFont("Bill Numbers: " + billsText, fontStyleIndex);
 
         let humanSign = "ℋ𝒶𝓇𝓂ℯ𝓈𝒽 𝒦𝓊𝓶𝒶𝓻";
 
-        // Assembled Message Format with Unique Font Styles
+        // Professional Clean Message Format
         let message = "━━━━━━━━━━━━━━━━━━━━━━\n" +
                       "   🏭 *PNPL SCM MOGA* (" + currentTheme.title + ")   \n" +
                       "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-                      currentTheme.emoji + " *DISPATCH CLEARANCE* 🚛\n\n" +
+                      currentTheme.emoji + " *VEHICLE CLEARANCE* 🚛\n\n" +
                       "🔹 " + styledVeh + "\n" +
                       "📌 *Status:* ✅ Approved for Dispatch\n\n" +
                       "📦 " + styledBags50 + "\n" +
