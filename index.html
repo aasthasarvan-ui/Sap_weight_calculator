@@ -973,51 +973,55 @@
         }
 
         function addonCalculate() {
-            const veh = document.getElementById('addonSelVehicle').value;
-            const vehCol = detectedCols.veh;
-            const qtyCol = detectedCols.qty;
-            const billCol = document.getElementById('selBillCol').value;
+    const veh = document.getElementById('addonSelVehicle').value;
+    const vehCol = detectedCols.veh;
+    const qtyCol = detectedCols.qty;
+    const billCol = document.getElementById('selBillCol').value;
+    const scope = document.getElementById('calcModeScope').value; // 👈 1. Yeh line add karni hai
 
-            if (!veh || !filteredData.length) return;
+    if (!veh || !filteredData.length) return;
 
-            let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
-            if (addonSelectedBills.length && billCol) {
-                rows = rows.filter(r => addonSelectedBills.includes(String(r[billCol])));
-            }
+    let rows = filteredData.filter(r => String(r[vehCol]).trim() === veh);
+    if (addonSelectedBills.length && billCol) {
+        rows = rows.filter(r => addonSelectedBills.includes(String(r[billCol])));
+    }
 
-            let s50 = 0, s25 = 0, eaQty = 0, eaWt = 0;
-            rows.forEach(r => {
-                let q = parseFloat(r[qtyCol]) || 0;
-                let d = String(r[detectedCols.desc] || '').toUpperCase();
-                let u = String(r[detectedCols.unit] || '').toUpperCase();
-                if (u.includes('EA')) {
-                    eaQty += q;
-                    let parsed = parseDescriptionWeight(d, q);
-                    eaWt += parsed.wt;
-                } else if (d.includes('25')) {
-                    s25 += q;
-                } else {
-                    s50 += q;
-                }
-            });
+    let s50 = 0, s25 = 0, eaQty = 0, eaWt = 0;
+    rows.forEach(r => {
+        let q = parseFloat(r[qtyCol]) || 0;
+        let d = String(r[detectedCols.desc] || '').toUpperCase();
+        let u = String(r[detectedCols.unit] || '').toUpperCase();
 
-            let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
-            let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
-            let opt1Total = bagsWt1 + eaWt;
-            let opt2Total = bagsWt2 + eaWt;
+        // 👈 2. Yeh do lines filter logic ke liye add karni hain
+        if (scope === 'bags' && u.includes('EA')) return;
+        if (scope === 'ea' && !u.includes('EA')) return;
 
-            document.getElementById('addonLiveTotalsTitle').innerText = `📈 Live Totals for ${veh} (Selection Active)`;
-            document.getElementById('addonM50').innerText = s50.toLocaleString() + " Bags";
-            document.getElementById('addonM25').innerText = s25.toLocaleString() + " Bags";
-            document.getElementById('addonMTot').innerText = (s50 + s25).toLocaleString() + " Bags";
-            document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
-            document.getElementById('addonOpt1MT').innerText = (opt1Total / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonOpt1Kg').innerText = `↑ ${opt1Total.toFixed(2)} Kgs`;
-            document.getElementById('addonOpt2MT').innerText = (opt2Total / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonOpt2Kg').innerText = `↑ ${opt2Total.toFixed(2)} Kgs`;
-            document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
-            document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
+        if (u.includes('EA')) {
+            eaQty += q;
+            let parsed = parseDescriptionWeight(d, q);
+            eaWt += parsed.wt;
+        } else if (d.includes('25')) {
+            s25 += q;
+        } else {
+            s50 += q;
         }
+    });
+
+    let bagsWt1 = (s50 * 50.120) + (s25 * 25.120);
+    let bagsWt2 = (s50 * 50.0) + (s25 * 25.0);
+
+    document.getElementById('addonLiveTotalsTitle').innerText = `📈 Live Totals for ${veh} (Selection Active)`;
+    document.getElementById('addonM50').innerText = s50.toLocaleString() + " Bags";
+    document.getElementById('addonM25').innerText = s25.toLocaleString() + " Bags";
+    document.getElementById('addonMTot').innerText = (s50 + s25).toLocaleString() + " Bags";
+    document.getElementById('addonMEA').innerText = eaQty.toLocaleString();
+    document.getElementById('addonOpt1MT').innerText = (bagsWt1 / 1000.0).toFixed(3) + " MT";
+    document.getElementById('addonOpt1Kg').innerText = `↑ ${bagsWt1.toFixed(2)} Kgs`;
+    document.getElementById('addonOpt2MT').innerText = (bagsWt2 / 1000.0).toFixed(3) + " MT";
+    document.getElementById('addonOpt2Kg').innerText = `↑ ${bagsWt2.toFixed(2)} Kgs`;
+    document.getElementById('addonEAMT').innerText = (eaWt / 1000.0).toFixed(3) + " MT";
+    document.getElementById('addonEAKg').innerText = `↑ ${eaWt.toFixed(2)} Kgs`;
+}
 
         function printReportWindow() { window.print(); }
         function exportFilteredExcel() {
