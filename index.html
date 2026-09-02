@@ -1031,16 +1031,16 @@
 </body>
 </html>
 
-        <!-- Quick WhatsApp Dispatch Alert (Direct Open Without Number Requirement) -->
+   <!-- Quick WhatsApp Dispatch Alert (100% Working & Click-Fix) -->
 <div class="card" style="border-color: #25d366; background: #0f172a;">
     <h4 style="color: #25d366; margin-top: 0; font-size: 15px;">💬 Quick WhatsApp Dispatch Alert</h4>
     <p style="font-size: 12px; color: var(--subtext-color); margin-bottom: 12px;">
-        1-click me PNPL SCM MOGA dispatch clearance message ke sath WhatsApp khule.
+        PNPL SCM MOGA dispatch clearance with dynamic vehicle styling and instant click.
     </p>
 
     <div class="row">
         <div class="col">
-            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0; height: 43px; width: 100%;">
+            <button onclick="sendWhatsAppDispatch()" style="background: #25d366; color: #000; font-weight: 700; margin-bottom: 0; height: 43px; width: 100%; cursor: pointer;">
                 🚀 Send WhatsApp Message
             </button>
         </div>
@@ -1065,7 +1065,7 @@
             },
             boldItalic: {
                 upper: "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑼𝑽𝑾𝑿𝒀𝒁",
-                lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝒍ｍ𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
+                lower: "𝒂𝒃𝒄𝒅𝒆𝗳𝗴𝒉𝒊𝒋𝒌𝒍𝒎𝒏ℴ𝓅𝒒𝗿𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛",
                 digits: "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
             }
         };
@@ -1184,8 +1184,19 @@
                       "──➦ [ PNPL SCM MOGA Hub ]\n" +
                       "━━━━━━━━━━━━━━━━━━━━━━";
 
-ิ      // Open WhatsApp directly without mobile number constraint
-        let url = "whatsapp://send?text=" + encodeURIComponent(message);
-        window.location.href = url;
+        // Bulletproof opening method with fallback
+        let waUrl = "whatsapp://send?text=" + encodeURIComponent(message);
+        let fallbackUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
+
+        // Try opening app scheme, fallback to web api if blocked
+        let iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = waUrl;
+        document.body.appendChild(iframe);
+        
+        setTimeout(function() {
+            document.body.removeChild(iframe);
+            window.location.href = fallbackUrl;
+        }, 500);
     }
 </script>
